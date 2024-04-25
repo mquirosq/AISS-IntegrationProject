@@ -1,4 +1,4 @@
-package aiss.videominer.controller;
+package aiss.videoMiner.controller;
 
 public class ChannelController {
 }

@@ -1,4 +1,4 @@
-package aiss.vimeominer;
+package aiss.vimeoMiner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
