@@ -12,10 +12,11 @@ import java.util.List;
  * @author Juan C. Alonso
  */
 @Entity
-@Table(name = "Channel")
+@Table(name = "channel")
 public class Channel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
     private String id;
 
@@ -41,6 +42,12 @@ public class Channel {
         this.videos = new ArrayList<>();
     }
 
+    public Channel(String name, String description, String createdTime){
+        this.name = name;
+        this.description = description;
+        this.createdTime = createdTime;
+        this.videos = new ArrayList<>();
+    }
     public String getId() {
         return id;
     }
