@@ -12,13 +12,13 @@ import java.util.List;
  * @author Juan C. Alonso
  */
 @Entity
-@Table(name = "channel")
+@Table(name = "Channel")
 public class Channel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
-    private String id;
+    private Long id;
 
     @JsonProperty("name")
     @NotEmpty(message = "Channel name cannot be empty")
@@ -48,11 +48,11 @@ public class Channel {
         this.createdTime = createdTime;
         this.videos = new ArrayList<>();
     }
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
