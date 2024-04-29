@@ -11,7 +11,7 @@ import aiss.vimeoMiner.service.ChannelService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/channels")
+@RequestMapping("/vimeoMiner/v1/channels")
 public class ChannelController {
     @Autowired
     ChannelService channelService;
