@@ -17,11 +17,13 @@ public class ChannelController {
     @Autowired
     ChannelRepository repository;
 
+    // GET all
     @GetMapping
     public List<Channel> findAll(){
         return repository.findAll();
     }
 
+    // GET data from a channel
     @GetMapping("/{channelId}")
     public Channel findOne(@PathVariable Long channelId) throws ChannelNotFoundException {
         Optional<Channel> channel = repository.findById(channelId);
@@ -31,6 +33,7 @@ public class ChannelController {
         return channel.get();
     }
 
+    // POST for Vimeo and YouTube Miners
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Channel create(@Valid @RequestBody Channel channel){
