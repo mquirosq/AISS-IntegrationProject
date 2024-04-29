@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Videos;
 
@@ -52,6 +53,22 @@ public class VideoService {
 
         return videosArray;
     }
+
+    // Post to VideoMiner:
+    public Video createVideo(Video video){
+        String uri = "localhost:8080/videoMiner/v1/channels/{channelId}/videos";
+        try {
+            HttpEntity<Video> request = new HttpEntity<>(video);
+            ResponseEntity<Video> response = restTemplate.exchange(uri, HttpMethod.POST, request, Video.class);
+            Video createdVideo = response.getBody();
+            return createdVideo;
+        }
+        catch(RestClientResponseException err) {
+            System.out.println("Error when creating the video " + video + ":"+ err.getLocalizedMessage());
+            return null;
+        }
+    }
+
 
 
     // Get next page URL
