@@ -39,14 +39,14 @@ public class VideoService {
         Videos videos = response.getBody();
         List<Video> videosArray = new ArrayList<>();
         if (videos != null){
-            videosArray = videos.getData().stream().toList();
+            videosArray = videos.getData();
         }
 
         String nextUrl = getNextPageUrl(response.getHeaders());
         while (nextUrl != null) {
             response = restTemplate.exchange(nextUrl, HttpMethod.GET, new HttpEntity<Videos>(header), Videos.class);
             videos = response.getBody();
-            videosArray.addAll(videos.getData().stream().toList());
+            videosArray.addAll(videos.getData());
             nextUrl = getNextPageUrl(response.getHeaders());
      }
 
