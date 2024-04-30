@@ -17,5 +17,7 @@ class ChannelServiceTest {
     void getChannel() {
         Channel channel = service.getChannel("1901688");
         System.out.println(channel.getName());
+        System.out.println(channel.getDescription());
+        System.out.println(channel.getCreatedTime());
     }
 }
