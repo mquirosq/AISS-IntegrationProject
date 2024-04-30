@@ -20,4 +20,10 @@ class VideoServiceTest {
         List<Video> videos = service.getVideos("/users/9096387/videos");
         videos.forEach(v -> System.out.println(v.getName()));
     }
+
+    @Test
+    void getVideosBadRequest() {
+        List<Video> videos = service.getVideos("/users/9/videos");
+        videos.forEach(v -> System.out.println(v.getName()));
+    }
 }
