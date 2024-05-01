@@ -56,7 +56,7 @@ public class VideoService {
 
     // Post to VideoMiner:
     public Video createVideo(Video video){
-        String uri = "localhost:8080/videoMiner/v1/channels/{channelId}/videos";
+        String uri = "http://localhost:8080/videoMiner/v1/channels/{channelId}/videos";
         try {
             HttpEntity<Video> request = new HttpEntity<>(video);
             ResponseEntity<Video> response = restTemplate.exchange(uri, HttpMethod.POST, request, Video.class);
