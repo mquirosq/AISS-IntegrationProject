@@ -22,8 +22,7 @@ public class VideoService {
     RestTemplate restTemplate;
 
     // Get from Vimeo API
-    public List<Video
-            > getVideos(String videosUri){
+    public List<Video> getVideos(String videosUri){
         // URI
         String uri = "https://api.vimeo.com" + videosUri;
 
