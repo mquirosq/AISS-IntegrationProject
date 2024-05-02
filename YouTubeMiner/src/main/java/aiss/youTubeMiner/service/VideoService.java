@@ -17,11 +17,18 @@ public class VideoService {
 
     final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
 
-    public List<VideoSnippet> getVideos(String videosId) {
+    public List<VideoSnippet> getVideos(String channelId) {
         List<VideoSnippet> out = new ArrayList<>();
-
+/*
         String uri = "https://www.googleapis.com/youtube/v3/videos";
-        uri += ("?id=" + videosId);
+        uri += ("?id=" + Id);
+        uri += ("&part=" + "snippet");
+        uri += ("&key=" + key);
+*/
+
+        String uri = "https://www.googleapis.com/youtube/v3/search";
+        uri += ("?channelId=" + channelId);
+        uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
         uri += ("&key=" + key);
 
@@ -39,7 +46,7 @@ public class VideoService {
             out.addAll(response.getBody().getItems());
         }
 
-        String next = getNextPage(response);
+        String next = getNextPage(uri, response);
 
         while (next != null) {
             response = restTemplate.exchange(next, HttpMethod.GET, null, VideoSnippetSearch.class);
@@ -47,31 +54,18 @@ public class VideoService {
             if (response.getBody() != null) {
                 out.addAll(response.getBody().getItems());
             }
-            next = getNextPage(response);
+            next = getNextPage(uri, response);
         }
         return out;
     }
 
-    public String getNextPage(ResponseEntity<VideoSnippetSearch> response) {
+    public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response) {
         String out = "";
-        List<String> linkHeader = response.getHeaders().get("Link");
+        String next = response.getBody().getNextPageToken();
 
-        if (linkHeader == null)
+        if (next == null) {
             return null;
-
-        // If the header contains no links, return null
-        String links = linkHeader.get(0);
-        if (links == null || links.isEmpty())
-            return null;
-
-        // Return the next page URL or null if none.
-        for (String s : links.split(", ")) {
-            if (s.endsWith("rel=\"next\"")) {
-                int idx = s.indexOf('>');
-                out = s.substring(1, idx);
-                break;
-            }
         }
-        return out;
+        return uri + ("&pageToken=" + next);
     }
 }

@@ -16,8 +16,8 @@ public class VideoController {
     @Autowired
     VideoService videoService;
 
-    @GetMapping("{videosId}")
-    public List<VideoSnippet> get(@PathVariable String videosId) {
-        return videoService.getVideos(videosId);
+    @GetMapping("{channelId}")
+    public List<VideoSnippet> get(@PathVariable String channelId) {
+        return videoService.getVideos(channelId);
     }
 }
