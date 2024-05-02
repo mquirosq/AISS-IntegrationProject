@@ -74,7 +74,7 @@ public class ChannelService {
 
     public VChannel transformChannel(Channel channel){
         VChannel vChannel = new VChannel();
-        vChannel.setId(Long.valueOf(channel.getId()));
+        vChannel.setId(channel.getId());
         vChannel.setName(channel.getName());
         vChannel.setDescription(channel.getDescription() == null? null:channel.getDescription().toString());
         vChannel.setCreatedTime(channel.getCreatedTime());

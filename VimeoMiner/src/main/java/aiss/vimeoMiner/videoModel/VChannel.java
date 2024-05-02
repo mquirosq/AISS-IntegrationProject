@@ -3,7 +3,7 @@ package aiss.vimeoMiner.videoModel;
 import java.util.List;
 
 public class VChannel {
-    private Long id;
+    private String id;
     private String name;
     private String description;
     private String createdTime;
@@ -40,11 +40,11 @@ public class VChannel {
         this.videos = videos;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }
