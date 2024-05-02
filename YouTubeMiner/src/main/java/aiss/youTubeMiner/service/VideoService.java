@@ -19,13 +19,6 @@ public class VideoService {
 
     public List<VideoSnippet> getVideos(String channelId) {
         List<VideoSnippet> out = new ArrayList<>();
-/*
-        String uri = "https://www.googleapis.com/youtube/v3/videos";
-        uri += ("?id=" + Id);
-        uri += ("&part=" + "snippet");
-        uri += ("&key=" + key);
-*/
-
         String uri = "https://www.googleapis.com/youtube/v3/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
@@ -60,7 +53,6 @@ public class VideoService {
     }
 
     public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response) {
-        String out = "";
         String next = response.getBody().getNextPageToken();
 
         if (next == null) {
