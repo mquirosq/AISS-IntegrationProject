@@ -1,5 +1,6 @@
 package aiss.vimeoMiner.service;
 
+import aiss.vimeoMiner.exception.ChannelNotFoundException;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ class ChannelServiceTest {
     ChannelService service;
 
     @Test
-    void getChannel() {
+    void getChannel() throws ChannelNotFoundException {
         Channel channel = service.getChannel("1901688");
         System.out.println(channel.getName());
         System.out.println(channel.getDescription());
