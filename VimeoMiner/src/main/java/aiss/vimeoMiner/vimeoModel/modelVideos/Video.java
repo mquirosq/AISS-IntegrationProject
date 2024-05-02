@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Video {
 
+    @JsonProperty("id")
+    private String id;
     @JsonProperty("uri")
     private String uri;
     @JsonProperty("name")
@@ -80,6 +82,14 @@ public class Video {
     private Boolean hasAudio;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @JsonProperty("uri")
     public String getUri() {

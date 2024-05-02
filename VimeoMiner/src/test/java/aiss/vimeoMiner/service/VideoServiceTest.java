@@ -1,5 +1,6 @@
 package aiss.vimeoMiner.service;
 
+import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Video;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Videos;
 import org.junit.jupiter.api.Test;

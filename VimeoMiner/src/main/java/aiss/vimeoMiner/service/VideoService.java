@@ -1,5 +1,7 @@
 package aiss.vimeoMiner.service;
 
+import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Video;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Videos;
@@ -15,6 +18,7 @@ import aiss.vimeoMiner.vimeoModel.modelVideos.Videos;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoService {
@@ -54,17 +58,24 @@ public class VideoService {
     }
 
     // Post to VideoMiner:
-    public Video createVideo(Video video){
-        String uri = "http://localhost:8080/videoMiner/v1/channels/{channelId}/videos";
+    public VVideo createVideo(Video video, Long channelId) throws VideoMinerConnectionRefusedException {
+        String uri = "http://localhost:8080/videoMiner/v1/channels/" + channelId + "/videos";
         try {
-            HttpEntity<Video> request = new HttpEntity<>(video);
-            ResponseEntity<Video> response = restTemplate.exchange(uri, HttpMethod.POST, request, Video.class);
-            Video createdVideo = response.getBody();
+            // Convert properties:
+            VVideo vVideo = transformVideo(video);
+            // Http request
+            HttpEntity<VVideo> request = new HttpEntity<>(vVideo);
+            ResponseEntity<VVideo> response = restTemplate.exchange(uri, HttpMethod.POST, request, VVideo.class);
+            VVideo createdVideo = response.getBody();
             return createdVideo;
         }
         catch(RestClientResponseException err) {
             System.out.println("Error when creating the video " + video + ":"+ err.getLocalizedMessage());
             return null;
+        }
+        catch(ResourceAccessException err){
+            // Catch connection exceptions
+            throw new VideoMinerConnectionRefusedException();
         }
     }
 
@@ -96,5 +107,17 @@ public class VideoService {
         }
 
         return result;
+    }
+
+    public VVideo transformVideo(Video video){
+        VVideo vVideo = new VVideo();
+        vVideo.setId(video.getUri().split("/")[1]);
+        vVideo.setName(video.getName());
+        vVideo.setDescription(video.getDescription());
+        vVideo.setComments(new ArrayList<>());
+        vVideo.setCaptions(new ArrayList<>());
+        vVideo.setReleaseTime(video.getReleaseTime());
+
+        return vVideo;
     }
 }

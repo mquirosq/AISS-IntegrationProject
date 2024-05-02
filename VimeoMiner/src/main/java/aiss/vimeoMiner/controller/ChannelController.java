@@ -6,6 +6,7 @@ import aiss.vimeoMiner.service.CaptionService;
 import aiss.vimeoMiner.service.CommentService;
 import aiss.vimeoMiner.service.VideoService;
 import aiss.vimeoMiner.videoModel.VChannel;
+import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Video;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +50,8 @@ public class ChannelController {
         VChannel createdChannel = channelService.createChannel(channel);
         List<Video> videoList = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri());
         for (Video v : videoList){
-            System.out.println(v.toString());
-            // VVideo vVideo = videoService.createVideo(v);
-            // createdChannel.getVideos().add(vVideo)
+            VVideo vVideo = videoService.createVideo(v, channelId);
+            createdChannel.getVideos().add(vVideo);
         }
 
         return createdChannel;
