@@ -39,6 +39,9 @@ public class ChannelService {
     public Channel createChannel(Channel channel){
         String uri = "http://localhost:8080/videoMiner/v1/channels";
         try {
+            // Convert properties:
+            channel.setAdditionalProperty("createdTime", channel.getCreatedTime());
+            // Http request
             HttpEntity<Channel> request = new HttpEntity<>(channel);
             ResponseEntity<Channel> response = restTemplate.exchange(uri, HttpMethod.POST, request, Channel.class);
             Channel createdChannel = response.getBody();
