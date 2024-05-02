@@ -26,7 +26,7 @@ public class VideoService {
         uri += ("&key=" + key);
 
         HttpHeaders headers = new HttpHeaders();
-        HttpEntity<VideoSnippetSearch> request = new HttpEntity<VideoSnippetSearch>(headers);
+        HttpEntity<VideoSnippetSearch> request = new HttpEntity<>(headers);
 
         ResponseEntity<VideoSnippetSearch> response = restTemplate.exchange(
                 uri,
