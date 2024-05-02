@@ -1,12 +1,13 @@
 package aiss.vimeoMiner.service;
 
+import aiss.vimeoMiner.exception.ChannelNotFoundException;
+import aiss.vimeoMiner.exception.GlobalExceptionHandler;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +19,7 @@ public class ChannelService {
     RestTemplate restTemplate;
 
     // Get from Vimeo API
-    public Channel getChannel(String channelId){
+    public Channel getChannel(String channelId) throws ChannelNotFoundException {
         // URI
         String uri = "https://api.vimeo.com/channels/" + channelId;
 
@@ -31,8 +32,13 @@ public class ChannelService {
         };
 
         // Send message
-        ResponseEntity<Channel> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Channel>(header),Channel.class);
-        return response.getBody();
+        try {
+            ResponseEntity<Channel> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Channel>(header),Channel.class);
+            return response.getBody();
+        }
+        catch (Exception err) {
+            throw new ChannelNotFoundException();
+        }
     }
 
     // Post to VideoMiner:

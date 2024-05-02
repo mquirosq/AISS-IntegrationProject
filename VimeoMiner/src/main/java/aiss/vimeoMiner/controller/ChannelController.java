@@ -1,5 +1,6 @@
 package aiss.vimeoMiner.controller;
 
+import aiss.vimeoMiner.exception.ChannelNotFoundException;
 import aiss.vimeoMiner.service.CaptionService;
 import aiss.vimeoMiner.service.CommentService;
 import aiss.vimeoMiner.service.VideoService;
@@ -26,16 +27,20 @@ public class ChannelController {
     CommentService commentService;
 
     @GetMapping("{channelId}")
-    public Channel findOne(@PathVariable Long channelId) {
-
-        Channel channel = channelService.getChannel(String.valueOf(channelId));
-        return channel;
+    public Channel findOne(@PathVariable Long channelId) throws ChannelNotFoundException {
+        try{
+            Channel channel = channelService.getChannel(String.valueOf(channelId));
+            return channel;
+        }
+        catch (Exception err){
+            throw err;
+        }
     }
 
     // TODO: Make it so you can populate with a list of IDs?
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("{channelId}")
-    public Channel populateOne(@PathVariable Long channelId) {
+    public Channel populateOne(@PathVariable Long channelId) throws ChannelNotFoundException {
 
         Channel channel = channelService.getChannel(String.valueOf(channelId));
         Channel createdChannel = channelService.createChannel(channel);
