@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Channel {
 
+    @JsonProperty("id")
+    private String id;
     @JsonProperty("uri")
     private String uri;
     @JsonProperty("name")
@@ -67,7 +69,7 @@ public class Channel {
     }
 
     @JsonProperty("description")
-    public void setDescription(Object description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -191,4 +193,11 @@ public class Channel {
         this.additionalProperties.put(name, value);
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String channelId) {
+        this.id = channelId;
+    }
 }

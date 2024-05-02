@@ -4,6 +4,7 @@ import aiss.vimeoMiner.exception.ChannelNotFoundException;
 import aiss.vimeoMiner.service.CaptionService;
 import aiss.vimeoMiner.service.CommentService;
 import aiss.vimeoMiner.service.VideoService;
+import aiss.vimeoMiner.videoModel.VChannel;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Video;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,11 @@ public class ChannelController {
     CommentService commentService;
 
     @GetMapping("{channelId}")
-    public Channel findOne(@PathVariable Long channelId) throws ChannelNotFoundException {
+    public VChannel findOne(@PathVariable Long channelId) throws ChannelNotFoundException {
         try{
             Channel channel = channelService.getChannel(String.valueOf(channelId));
-            return channel;
+            VChannel vChannel = channelService.transformChannel(channel);
+            return vChannel;
         }
         catch (Exception err){
             throw err;
@@ -40,14 +42,15 @@ public class ChannelController {
     // TODO: Make it so you can populate with a list of IDs?
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("{channelId}")
-    public Channel populateOne(@PathVariable Long channelId) throws ChannelNotFoundException {
+    public VChannel populateOne(@PathVariable Long channelId) throws ChannelNotFoundException {
 
         Channel channel = channelService.getChannel(String.valueOf(channelId));
-        Channel createdChannel = channelService.createChannel(channel);
+        VChannel createdChannel = channelService.createChannel(channel);
         List<Video> videoList = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri());
         for (Video v : videoList){
             System.out.println(v.toString());
-            // videoService.createVideo(v);
+            // VVideo vVideo = videoService.createVideo(v);
+            // createdChannel.getVideos().add(vVideo)
         }
 
         return createdChannel;

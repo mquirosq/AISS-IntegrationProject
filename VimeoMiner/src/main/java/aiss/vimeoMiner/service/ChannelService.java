@@ -2,6 +2,8 @@ package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
 import aiss.vimeoMiner.exception.GlobalExceptionHandler;
+import aiss.vimeoMiner.videoModel.VChannel;
+import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
 
 
 @Service
@@ -34,7 +38,9 @@ public class ChannelService {
         // Send message
         try {
             ResponseEntity<Channel> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Channel>(header),Channel.class);
-            return response.getBody();
+            Channel channel = response.getBody();
+            channel.setId(channelId);
+            return channel;
         }
         catch (Exception err) {
             throw new ChannelNotFoundException();
@@ -42,15 +48,15 @@ public class ChannelService {
     }
 
     // Post to VideoMiner:
-    public Channel createChannel(Channel channel){
+    public VChannel createChannel(Channel channel){
         String uri = "http://localhost:8080/videoMiner/v1/channels";
         try {
             // Convert properties:
-            channel.setAdditionalProperty("createdTime", channel.getCreatedTime());
+            VChannel vChannel = transformChannel(channel);
             // Http request
-            HttpEntity<Channel> request = new HttpEntity<>(channel);
-            ResponseEntity<Channel> response = restTemplate.exchange(uri, HttpMethod.POST, request, Channel.class);
-            Channel createdChannel = response.getBody();
+            HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
+            ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);
+            VChannel createdChannel = response.getBody();
             return createdChannel;
         }
         catch(RestClientResponseException err) {
@@ -58,5 +64,18 @@ public class ChannelService {
             return null;
         }
     }
+
+    public VChannel transformChannel(Channel channel){
+        VChannel vChannel = new VChannel();
+        vChannel.setId(Long.valueOf(channel.getId()));
+        vChannel.setName(channel.getName());
+        vChannel.setDescription(channel.getDescription() == null? null:channel.getDescription().toString());
+        vChannel.setCreatedTime(channel.getCreatedTime());
+        vChannel.setVideos(new ArrayList<VVideo>());
+
+        return vChannel;
+    }
+
+
 
 }
