@@ -16,9 +16,8 @@ import java.util.List;
 public class Channel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @JsonProperty("name")
     @NotEmpty(message = "Channel name cannot be empty")
@@ -42,17 +41,19 @@ public class Channel {
         this.videos = new ArrayList<>();
     }
 
-    public Channel(String name, String description, String createdTime){
+    public Channel(String id, String name, String description, String createdTime){
+        this.id = id;
         this.name = name;
         this.description = description;
         this.createdTime = createdTime;
         this.videos = new ArrayList<>();
     }
-    public Long getId() {
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
