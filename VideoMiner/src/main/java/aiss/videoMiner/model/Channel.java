@@ -17,6 +17,7 @@ public class Channel {
 
     @Id
     @JsonProperty("id")
+    @NotNull(message = "Channel must have an id")
     private String id;
 
     @JsonProperty("name")
