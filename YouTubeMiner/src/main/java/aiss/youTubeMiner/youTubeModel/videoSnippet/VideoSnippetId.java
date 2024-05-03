@@ -1,5 +1,5 @@
 
-package aiss.youTubeMiner.model.videoSnippet;
+package aiss.youTubeMiner.youTubeModel.videoSnippet;
 
 import com.fasterxml.jackson.annotation.*;
 

@@ -1,6 +1,6 @@
 package aiss.youTubeMiner.controller;
 
-import aiss.youTubeMiner.model.videoSnippet.VideoSnippet;
+import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

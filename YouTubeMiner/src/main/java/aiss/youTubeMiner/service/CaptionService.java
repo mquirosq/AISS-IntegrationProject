@@ -1,9 +1,7 @@
 package aiss.youTubeMiner.service;
 
-import aiss.youTubeMiner.model.caption.Caption;
-import aiss.youTubeMiner.model.caption.CaptionSearch;
-import aiss.youTubeMiner.model.videoSnippet.VideoSnippet;
-import aiss.youTubeMiner.model.videoSnippet.VideoSnippetSearch;
+import aiss.youTubeMiner.youTubeModel.caption.Caption;
+import aiss.youTubeMiner.youTubeModel.caption.CaptionSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

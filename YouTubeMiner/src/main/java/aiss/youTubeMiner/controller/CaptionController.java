@@ -1,6 +1,6 @@
 package aiss.youTubeMiner.controller;
 
-import aiss.youTubeMiner.model.caption.Caption;
+import aiss.youTubeMiner.youTubeModel.caption.Caption;
 import aiss.youTubeMiner.service.CaptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

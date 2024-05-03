@@ -1,5 +1,5 @@
 
-package aiss.youTubeMiner.model.channel;
+package aiss.youTubeMiner.youTubeModel.channel;
 
 
 import com.fasterxml.jackson.annotation.*;

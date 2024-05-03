@@ -1,6 +1,6 @@
 package aiss.youTubeMiner.controller;
 
-import aiss.youTubeMiner.model.channel.Channel;
+import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

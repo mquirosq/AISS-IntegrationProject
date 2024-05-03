@@ -1,7 +1,7 @@
 package aiss.youTubeMiner.service;
 
-import aiss.youTubeMiner.model.videoSnippet.VideoSnippet;
-import aiss.youTubeMiner.model.videoSnippet.VideoSnippetSearch;
+import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
+import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
