@@ -25,7 +25,7 @@ public class ChannelController {
 
     // GET data from a channel
     @GetMapping("/{channelId}")
-    public Channel findOne(@PathVariable Long channelId) throws ChannelNotFoundException {
+    public Channel findOne(@PathVariable String channelId) throws ChannelNotFoundException {
         Optional<Channel> channel = repository.findById(channelId);
         if (!channel.isPresent()){
             throw new ChannelNotFoundException();

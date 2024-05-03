@@ -33,13 +33,13 @@ public class VideoController {
     }
 
     @GetMapping("/channels/{channelId}/videos")
-    public List<Video> findByChannel(@PathVariable Long channelId) throws ChannelNotFoundException {
+    public List<Video> findByChannel(@PathVariable String channelId) throws ChannelNotFoundException {
         return channelRepository.findById(channelId).orElseThrow(ChannelNotFoundException::new).getVideos();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/channels/{channelId}/videos")
-    public Video create(@PathVariable Long channelId, @Valid @RequestBody Video video) throws ChannelNotFoundException {
+    public Video create(@PathVariable String channelId, @Valid @RequestBody Video video) throws ChannelNotFoundException {
         Channel channel = channelRepository.findById(channelId).orElseThrow(ChannelNotFoundException::new);
         List<Video> videos = channel.getVideos();
 
