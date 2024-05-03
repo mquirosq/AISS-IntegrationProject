@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import aiss.vimeoMiner.service.ChannelService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/vimeoMiner/v1/channels")
@@ -45,18 +44,23 @@ public class ChannelController {
     // TODO: Make it so you can populate with a list of IDs?
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("{channelId}")
-    public VChannel populateOne(@PathVariable String channelId) throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException {
+    public VChannel populateOne(@PathVariable String channelId,
+                                @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
+                                @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
+            throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException {
 
         Channel channel = channelService.getChannel(String.valueOf(channelId));
         VChannel createdChannel = channelService.createChannel(channel);
-        List<Video> videoList = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri());
-        for (Video v : videoList){
-            if (v != null) {
-                VVideo vVideo = videoService.createVideo(v, channelId);
-                createdChannel.getVideos().add(vVideo);
+        if (maxVideos > 0){
+            List<Video> videoList = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri());
+            for (Video v : videoList.subList(0, Math.min(maxVideos, videoList.size()))) {
+                if (v != null) {
+                    VVideo vVideo = videoService.createVideo(v, channelId);
+                    createdChannel.getVideos().add(vVideo);
+                }
+                // TODO: Implement max Comments
             }
         }
-
         return createdChannel;
     }
 }
