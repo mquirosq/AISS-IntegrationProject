@@ -45,7 +45,7 @@ public class ChannelService {
             channel.setId(channelId);
             return channel;
         }
-        catch (Exception err) {
+        catch (RestClientResponseException err) {
             throw new ChannelNotFoundException();
         }
     }

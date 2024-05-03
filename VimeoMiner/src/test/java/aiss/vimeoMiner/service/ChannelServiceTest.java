@@ -23,11 +23,12 @@ class ChannelServiceTest {
         Channel channel = service.getChannel(channelId);
         assertEquals(channelId, channel.getId());
     }
+
     // Negative test
     @Test
     void getChannelNotFound() {
         String channelId = "1";
-        assertThrows(ChannelNotFoundException.class, () -> {service.getChannel(channelId);});
+        assertThrows(ChannelNotFoundException.class, () -> service.getChannel(channelId));
     }
 
     // Create test:
