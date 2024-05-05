@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("youtubeMiner/api/v1/captions")
+@RequestMapping("youtubeMiner/api/v1/videos")
 public class CaptionController {
     @Autowired
     CaptionService captionService;
 
-    @GetMapping("{videoId}")
-    public List<Caption> get(@PathVariable String videoId) {
+    @GetMapping("{videoId}/captions")
+    public List<Caption> findAll(@PathVariable String videoId) {
         return captionService.getCaptions(videoId);
     }
 }

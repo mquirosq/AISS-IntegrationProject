@@ -33,16 +33,6 @@ public class ChannelController {
     public VChannel populateOne(@PathVariable String channelId) throws VideoMinerConnectionRefusedException {
         Channel channel = findOne(channelId);
         VChannel out = channelService.createChannel(channel);
-/*
-        out.setVideos(videoService.getVideos(channelId).stream().map(x -> {
-            try {
-                return videoService.createVideo(x);
-            } catch (VideoMinerConnectionRefusedException e) {
-                throw new RuntimeException(e);
-            }
-        })
-        .collect(Collectors.toList()));
-*/
 
         videoService.getVideos(channelId).stream().forEach(x -> {
             try {

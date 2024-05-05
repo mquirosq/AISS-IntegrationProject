@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("youtubeMiner/api/v1/videos")
+@RequestMapping("youtubeMiner/api/v1/channels")
 public class VideoController {
     @Autowired
     VideoService videoService;
 
-    @GetMapping("{channelId}")
-    public List<VideoSnippet> get(@PathVariable String channelId) {
+    @GetMapping("/{channelId}/videos")
+    public List<VideoSnippet> findAll(@PathVariable String channelId) {
         return videoService.getVideos(channelId);
     }
 }
