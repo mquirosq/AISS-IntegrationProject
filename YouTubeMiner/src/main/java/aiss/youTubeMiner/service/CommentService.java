@@ -129,9 +129,9 @@ public class CommentService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VComment createComment(Comment comment, String videoId, String channelId) throws VideoMinerConnectionRefusedException {
+    public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException {
         try {
-            String uri = "http://localhost:8080/videoMiner/v1/channel/" + channelId + "/videos/" + videoId + "/comments";
+            String uri = "http://localhost:8080/videoMiner/v1/videos/" + videoId + "/comments";
             VComment vComment = mapComment(comment);
             HttpEntity<VComment> request = new HttpEntity<>(vComment);
             ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
@@ -144,9 +144,9 @@ public class CommentService {
         }
     }
     
-    public VUser createUser(String commentId, String videoId, String channelId) throws VideoMinerConnectionRefusedException {
+    public VUser createUser(String commentId) throws VideoMinerConnectionRefusedException {
         try {
-            String uri = "http://localhost:8080/videoMiner/v1/channel/" + channelId + "/videos/" + videoId + "/comments/" + commentId + "/user";
+            String uri = "http://localhost:8080/videoMiner/v1/comments/" + commentId + "/user";
             VUser vUser = getUser(commentId);
             HttpEntity<VUser> request = new HttpEntity<>(vUser);
             ResponseEntity<VUser> response = restTemplate.exchange(uri, HttpMethod.POST, request, VUser.class);
