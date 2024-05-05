@@ -1,6 +1,8 @@
 package aiss.youTubeMiner.controller;
 
+import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.service.VideoService;
 import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.videoModel.VVideo;
@@ -24,13 +26,14 @@ public class ChannelController {
     VideoService videoService;
 
     @GetMapping("{channelId}")
-    public Channel findOne(@PathVariable String channelId) {
+    public Channel findOne(@PathVariable String channelId) throws ChannelNotFoundException {
         return channelService.getChannel(channelId);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("{channelId}")
-    public VChannel populateOne(@PathVariable String channelId) throws VideoMinerConnectionRefusedException {
+    public VChannel populateOne(@PathVariable String channelId)
+            throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException {
         Channel channel = findOne(channelId);
         VChannel out = channelService.createChannel(channel);
 

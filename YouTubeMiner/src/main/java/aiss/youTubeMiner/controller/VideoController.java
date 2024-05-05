@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.controller;
 
+import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ public class VideoController {
     @Autowired
     VideoService videoService;
 
-    @GetMapping("/{channelId}/videos")
-    public List<VideoSnippet> findAll(@PathVariable String channelId) {
+    @GetMapping("{channelId}/videos")
+    public List<VideoSnippet> findAll(@PathVariable String channelId) throws VideoNotFoundException {
         return videoService.getVideos(channelId);
     }
 }

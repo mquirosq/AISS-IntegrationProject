@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.service;
 
+import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.videoModel.VVideo;
@@ -22,7 +23,7 @@ public class ChannelService {
 
     final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
 
-    public Channel getChannel(String channelId) {
+    public Channel getChannel(String channelId) throws ChannelNotFoundException {
         String uri = "https://www.googleapis.com/youtube/v3/channels";
         uri += ("?id=" + channelId);
         uri += ("&part=" + "snippet");
@@ -36,7 +37,12 @@ public class ChannelService {
                 request,
                 ChannelSearch.class
         );
-        return response.getBody().getItems().get(0);
+
+        try {
+            return response.getBody().getItems().get(0);
+        } catch (RestClientResponseException e) {
+            throw new ChannelNotFoundException();
+        }
     }
 
     public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException {

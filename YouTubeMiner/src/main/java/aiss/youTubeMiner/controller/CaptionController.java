@@ -2,6 +2,7 @@ package aiss.youTubeMiner.controller;
 
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
 import aiss.youTubeMiner.service.CaptionService;
+import aiss.youTubeMiner.exception.CaptionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,7 @@ public class CaptionController {
     CaptionService captionService;
 
     @GetMapping("{videoId}/captions")
-    public List<Caption> findAll(@PathVariable String videoId) {
+    public List<Caption> findAll(@PathVariable String videoId) throws CaptionNotFoundException {
         return captionService.getCaptions(videoId);
     }
 }

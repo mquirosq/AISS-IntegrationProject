@@ -1,6 +1,7 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
@@ -21,7 +22,7 @@ public class VideoService {
 
     final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
 
-    public List<VideoSnippet> getVideos(String channelId) {
+    public List<VideoSnippet> getVideos(String channelId) throws VideoNotFoundException {
         List<VideoSnippet> out = new ArrayList<>();
         String uri = "https://www.googleapis.com/youtube/v3/search";
         uri += ("?channelId=" + channelId);
@@ -39,21 +40,25 @@ public class VideoService {
                 VideoSnippetSearch.class
         );
 
-        if (response.getBody() != null) {
-            out.addAll(response.getBody().getItems());
-        }
-
-        String next = getNextPage(uri, response);
-
-        while (next != null) {
-            response = restTemplate.exchange(next, HttpMethod.GET, null, VideoSnippetSearch.class);
-
+        try {
             if (response.getBody() != null) {
                 out.addAll(response.getBody().getItems());
             }
-            next = getNextPage(uri, response);
+
+            String next = getNextPage(uri, response);
+
+            while (next != null) {
+                response = restTemplate.exchange(next, HttpMethod.GET, null, VideoSnippetSearch.class);
+
+                if (response.getBody() != null) {
+                    out.addAll(response.getBody().getItems());
+                }
+                next = getNextPage(uri, response);
+            }
+            return out;
+        } catch (RestClientResponseException e) {
+            throw new VideoNotFoundException();
         }
-        return out;
     }
 
     public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response) {
