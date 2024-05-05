@@ -71,7 +71,7 @@ public class CaptionService {
         String uri = "http://localhost:8080/videoMiner/v1/videos/" + videoId + "/captions";
         try {
             // Convert properties:
-            VCaption vCaption = transformComment(caption);
+            VCaption vCaption = transformCaption(caption);
             // Http request
             HttpEntity<VCaption> request = new HttpEntity<>(vCaption);
             ResponseEntity<VCaption> response = restTemplate.exchange(uri, HttpMethod.POST, request, VCaption.class);
@@ -115,7 +115,7 @@ public class CaptionService {
         return result;
     }
 
-    public VCaption transformComment(Caption caption){
+    public VCaption transformCaption(Caption caption){
         VCaption vCaption = new VCaption();
         vCaption.setId(caption.getId().toString());
         vCaption.setName(caption.getName());
