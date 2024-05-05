@@ -33,13 +33,13 @@ public class CommentController {
         return commentRepository.findById(Long.valueOf(commentId)).orElseThrow(CommentNotFoundException::new);
     }
 
-    @GetMapping("/channels/{channelId}/videos/{videoId}/comments")
+    @GetMapping("/videos/{videoId}/comments")
     public List<Comment> findByVideo(@PathVariable String videoId) throws VideoNotFoundException {
         return videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new).getComments();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/channels/{channelId}/videos/{videoId}/comments")
+    @PostMapping("/videos/{videoId}/comments")
     public Comment create(@PathVariable String videoId, @Valid @RequestBody Comment comment) throws VideoNotFoundException {
         Video video = videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new);
         List<Comment> comments = video.getComments();
