@@ -17,7 +17,7 @@ public class CaptionController {
     @Autowired
     CaptionService captionService;
 
-    @GetMapping("{videoId}/captions")
+    @GetMapping("/{videoId}/captions")
     public List<Caption> findAll(@PathVariable String videoId) throws CaptionNotFoundException {
         return captionService.getCaptions(videoId);
     }

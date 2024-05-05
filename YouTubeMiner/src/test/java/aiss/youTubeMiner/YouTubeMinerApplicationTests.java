@@ -8,5 +8,6 @@ class YouTubeMinerApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 }

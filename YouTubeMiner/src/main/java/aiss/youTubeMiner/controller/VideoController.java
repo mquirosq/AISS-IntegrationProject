@@ -17,7 +17,7 @@ public class VideoController {
     @Autowired
     VideoService videoService;
 
-    @GetMapping("{channelId}/videos")
+    @GetMapping("/{channelId}/videos")
     public List<VideoSnippet> findAll(@PathVariable String channelId) throws VideoNotFoundException {
         return videoService.getVideos(channelId);
     }

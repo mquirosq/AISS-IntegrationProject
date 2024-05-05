@@ -31,16 +31,16 @@ public class ChannelService {
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<ChannelSearch> request = new HttpEntity<>(headers);
-        ResponseEntity<ChannelSearch> response = restTemplate.exchange(
-                uri,
-                HttpMethod.GET,
-                request,
-                ChannelSearch.class
-        );
 
         try {
+            ResponseEntity<ChannelSearch> response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    request,
+                    ChannelSearch.class
+            );
             return response.getBody().getItems().get(0);
-        } catch (RestClientResponseException e) {
+        } catch (NullPointerException|RestClientResponseException e) {
             throw new ChannelNotFoundException();
         }
     }

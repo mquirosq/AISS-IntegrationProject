@@ -8,9 +8,7 @@ import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,6 @@ public class VideoService {
     final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
 
     public List<VideoSnippet> getVideos(String channelId) throws VideoNotFoundException {
-        List<VideoSnippet> out = new ArrayList<>();
         String uri = "https://www.googleapis.com/youtube/v3/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
@@ -33,19 +30,20 @@ public class VideoService {
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<VideoSnippetSearch> request = new HttpEntity<>(headers);
 
-        ResponseEntity<VideoSnippetSearch> response = restTemplate.exchange(
-                uri,
-                HttpMethod.GET,
-                request,
-                VideoSnippetSearch.class
-        );
-
         try {
+            ResponseEntity<VideoSnippetSearch> response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    request,
+                    VideoSnippetSearch.class
+            );
+            List<VideoSnippet> out = new ArrayList<>();
+            String next = null;
+
             if (response.getBody() != null) {
                 out.addAll(response.getBody().getItems());
+                next = getNextPage(uri, response);
             }
-
-            String next = getNextPage(uri, response);
 
             while (next != null) {
                 response = restTemplate.exchange(next, HttpMethod.GET, null, VideoSnippetSearch.class);
@@ -61,8 +59,14 @@ public class VideoService {
         }
     }
 
-    public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response) {
-        String next = response.getBody().getNextPageToken();
+    public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response) throws VideoNotFoundException {
+        String next = null;
+
+        try {
+            next = response.getBody().getNextPageToken();
+        } catch (NullPointerException e) {
+            throw new VideoNotFoundException();
+        }
 
         if (next == null) {
             return null;

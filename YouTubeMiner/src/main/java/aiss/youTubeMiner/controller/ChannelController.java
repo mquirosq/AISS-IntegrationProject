@@ -1,9 +1,6 @@
 package aiss.youTubeMiner.controller;
 
-import aiss.youTubeMiner.exception.ChannelNotFoundException;
-import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
-import aiss.youTubeMiner.exception.VideoNotFoundException;
+import aiss.youTubeMiner.exception.*;
 import aiss.youTubeMiner.service.CaptionService;
 import aiss.youTubeMiner.service.CommentService;
 import aiss.youTubeMiner.service.VideoService;
@@ -74,13 +71,17 @@ public class ChannelController {
             });
         }
         out.getVideos().forEach( x -> {
-            captionService.getCaptions(x.getId()).forEach( c -> {
-                try {
-                    x.getCaptions().add(captionService.createCaption(x.getId(),c));
-                } catch (VideoMinerConnectionRefusedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            try {
+                captionService.getCaptions(x.getId()).forEach(c -> {
+                    try {
+                        x.getCaptions().add(captionService.createCaption(x.getId(),c));
+                    } catch (VideoMinerConnectionRefusedException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (CaptionNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         });
         return out;
     }
