@@ -36,6 +36,8 @@ public class User {
         this.picture_link = picture_link;
     }
 
+    public User(){
+    }
     public Long getId() {
         return id;
     }
