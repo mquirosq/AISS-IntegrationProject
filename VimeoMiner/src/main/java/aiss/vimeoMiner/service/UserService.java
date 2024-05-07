@@ -1,6 +1,8 @@
 package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
+import aiss.vimeoMiner.exception.UserNotFoundException;
+import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import aiss.vimeoMiner.vimeoModel.modelUser.ModelUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -13,22 +15,27 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UserService {
-
     @Autowired
-    private RestTemplate restTemplate;
+    RestTemplate restTemplate;
 
-    public ModelUser getUser(String userId) throws ChannelNotFoundException {
-        String uri = "https://api.vimeo.com/users/" + userId;
+    // Get from Vimeo API
+    public ModelUser getUser(String userUri) throws UserNotFoundException {
+        String uri = "https://api.vimeo.com" + userUri;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer ee507ffdb4da956d56252e8eb067fb58");
+        HttpHeaders header = new HttpHeaders(){
+            {
+                String auth = "Bearer ee507ffdb4da956d56252e8eb067fb58";
+                set("Authorization", auth);
+            }
+        };
 
         try {
-            System.out.println(uri+"this is an uri");
-            ResponseEntity<ModelUser> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), ModelUser.class);
-            return response.getBody();
-        } catch (RestClientResponseException ex) {
-            throw new ChannelNotFoundException();
+            ResponseEntity<ModelUser> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<ModelUser>(header),ModelUser.class);
+            ModelUser user = response.getBody();
+            return user;
+        }
+        catch (RestClientResponseException err) {
+            throw new UserNotFoundException();
         }
     }
 
