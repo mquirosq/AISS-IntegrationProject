@@ -1,6 +1,7 @@
 package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
+import aiss.vimeoMiner.exception.UserNotFoundException;
 import aiss.vimeoMiner.service.UserService;
 import aiss.vimeoMiner.vimeoModel.modelUser.ModelUser;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,16 +23,16 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUser_Success() throws ChannelNotFoundException {
+    public void testGetUser_Success() throws UserNotFoundException {
         // Arrange
-        String userId = "5241831";
-        String expectedUri = "https://api.vimeo.com/users/" + userId;
-        HttpHeaders expectedHeaders = new HttpHeaders();
-        expectedHeaders.set("Authorization", "Bearer ee507ffdb4da956d56252e8eb067fb58");
+        String userUri = "/users/5241831";
+        String expectedUri = "https://api.vimeo.com" + userUri;
 
-        RestTemplate restTemplate = new RestTemplate();
 
-        ModelUser actualUser = userService.getUser(userId);
+
+
+
+        ModelUser actualUser = userService.getUser(userUri);
 
         //Assert
         //assertEquals(userId, actualUser);
@@ -50,6 +51,6 @@ public class UserServiceTest {
         RestTemplate restTemplate = new RestTemplate();
 
 
-        assertThrows(ChannelNotFoundException.class, () -> userService.getUser(userId));
+        assertThrows(UserNotFoundException.class, () -> userService.getUser(userId));
     }
 }
