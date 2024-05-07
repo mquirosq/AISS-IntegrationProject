@@ -2,6 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
+import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
@@ -18,14 +19,12 @@ public class VideoService {
     @Autowired
     RestTemplate restTemplate;
 
-    final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
-
     public List<VideoSnippet> getVideos(String channelId) throws VideoNotFoundException {
-        String uri = "https://www.googleapis.com/youtube/v3/search";
+        String uri = Constants.ytBase + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + key);
+        uri += ("&key=" + Constants.apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<VideoSnippetSearch> request = new HttpEntity<>(headers);
@@ -76,7 +75,7 @@ public class VideoService {
 
     public VVideo createVideo(String channelId, VideoSnippet video) throws VideoMinerConnectionRefusedException {
         try {
-            String uri = "http://localhost:8080/videoMiner/v1/channels/" + channelId + "/videos";
+            String uri = Constants.vmBase + "/channels/" + channelId + "/videos";
             VVideo vVideo = mapVideo(video);
             HttpEntity<VVideo> request = new HttpEntity<>(vVideo);
             ResponseEntity<VVideo> response = restTemplate.exchange(uri, HttpMethod.POST, request, VVideo.class);

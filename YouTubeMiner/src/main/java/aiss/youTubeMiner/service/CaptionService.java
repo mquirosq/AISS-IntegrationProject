@@ -2,6 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CaptionNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
@@ -24,13 +25,11 @@ public class CaptionService {
     @Autowired
     RestTemplate restTemplate;
 
-    final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
-
     public List<Caption> getCaptions(String videoId) throws CaptionNotFoundException {
-        String uri = "https://www.googleapis.com/youtube/v3/captions";
+        String uri = Constants.ytBase + "/captions";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + key);
+        uri += ("&key=" + Constants.apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<CaptionSearch> request = new HttpEntity<>(headers);
@@ -50,7 +49,7 @@ public class CaptionService {
 
     public VCaption createCaption(String videoId, Caption caption) throws VideoMinerConnectionRefusedException {
         try {
-            String uri = "http://localhost:8080/videoMiner/v1/videos/" + videoId + "/captions";
+            String uri = Constants.vmBase + "/videos/" + videoId + "/captions";
             VCaption vCaption = mapCaption(caption);
             HttpEntity<VCaption> request = new HttpEntity<>(vCaption);
             ResponseEntity<VCaption> response = restTemplate.exchange(uri, HttpMethod.POST, request, VCaption.class);

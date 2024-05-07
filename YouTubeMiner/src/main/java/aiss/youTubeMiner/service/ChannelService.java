@@ -2,6 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
@@ -21,13 +22,11 @@ public class ChannelService {
     @Autowired
     public RestTemplate restTemplate;
 
-    final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
-
     public Channel getChannel(String channelId) throws ChannelNotFoundException {
-        String uri = "https://www.googleapis.com/youtube/v3/channels";
+        String uri = Constants.ytBase + "/channels";
         uri += ("?id=" + channelId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + key);
+        uri += ("&key=" + Constants.apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<ChannelSearch> request = new HttpEntity<>(headers);
@@ -47,7 +46,7 @@ public class ChannelService {
 
     public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException {
         try {
-            String uri = "http://localhost:8080/videoMiner/v1/channels";
+            String uri = Constants.vmBase + "/channels";
             VChannel vChannel = mapChannel(channel);
             HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
             ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);

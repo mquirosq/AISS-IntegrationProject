@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.controller;
 
+import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
 import aiss.youTubeMiner.service.CaptionService;
 import aiss.youTubeMiner.exception.CaptionNotFoundException;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("youtubeMiner/api/v1/videos")
+@RequestMapping(Constants.apiBase + "/videos")
 public class CaptionController {
     @Autowired
     CaptionService captionService;

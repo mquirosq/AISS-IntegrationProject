@@ -3,6 +3,7 @@ package aiss.youTubeMiner.service;
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VUser;
 import aiss.youTubeMiner.youTubeModel.comment.*;
@@ -21,8 +22,6 @@ public class CommentService {
     @Autowired
     RestTemplate restTemplate;
 
-    final String key = "AIzaSyCgo33WDq8_uoH6tWH6COhTmemxQbimDHY";
-
     public VUser getUser(String commentsId) throws CommentNotFoundException {
         try {
             List<Comment> ls = getComment(commentsId);
@@ -35,10 +34,10 @@ public class CommentService {
     public List<Comment> getComment(String commentsId) throws CommentNotFoundException {
         List<Comment> out = new ArrayList<>();
 
-        String uri = "https://www.googleapis.com/youtube/v3/commentThreads";
+        String uri = Constants.ytBase + "/commentThreads";
         uri += ("?id=" + commentsId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + key);
+        uri += ("&key=" + Constants.apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<CommentSearch> request = new HttpEntity<>(headers);
@@ -74,10 +73,10 @@ public class CommentService {
     public List<Comment> getCommentsFromVideo(String videoId) throws VideoCommentsNotFoundException {
         List<Comment> out = new ArrayList<>();
 
-        String uri = "https://www.googleapis.com/youtube/v3/commentThreads";
+        String uri = Constants.ytBase + "/commentThreads";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + key);
+        uri += ("&key=" + Constants.apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<CommentSearch> request = new HttpEntity<CommentSearch>(headers);
@@ -131,7 +130,7 @@ public class CommentService {
 
     public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException {
         try {
-            String uri = "http://localhost:8080/videoMiner/v1/videos/" + videoId + "/comments";
+            String uri = Constants.vmBase + "/videos/" + videoId + "/comments";
             VComment vComment = mapComment(comment);
             HttpEntity<VComment> request = new HttpEntity<>(vComment);
             ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
@@ -146,7 +145,7 @@ public class CommentService {
     
     public VUser createUser(String commentId) throws VideoMinerConnectionRefusedException {
         try {
-            String uri = "http://localhost:8080/videoMiner/v1/comments/" + commentId + "/user";
+            String uri = Constants.vmBase + "/comments/" + commentId + "/user";
             VUser vUser = getUser(commentId);
             HttpEntity<VUser> request = new HttpEntity<>(vUser);
             ResponseEntity<VUser> response = restTemplate.exchange(uri, HttpMethod.POST, request, VUser.class);
