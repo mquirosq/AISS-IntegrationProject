@@ -47,10 +47,9 @@ public class UserServiceTest {
         ModelUser modelUser=userService.getUser("/users/5241831");
         VUser createdUser = userService.createUser(modelUser);
         assertNotNull(createdUser.getName());
-        assertEquals(modelUser.getUri(), modelUser.getUri());
         assertEquals(modelUser.getName(), createdUser.getName());
+        assertEquals(modelUser.getLink(), createdUser.getUser_link());
         assertEquals(modelUser.getPictures().getBaseLink(), createdUser.getPicture_link());
-
 
     }
 }

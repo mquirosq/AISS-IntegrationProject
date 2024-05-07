@@ -33,7 +33,6 @@ public class UserService {
         headers.set("Authorization", "Bearer ee507ffdb4da956d56252e8eb067fb58");
 
         try {
-            System.out.println(uri+"this is an uri");
             ResponseEntity<ModelUser> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), ModelUser.class);
             return response.getBody();
         } catch (RestClientResponseException ex) {
@@ -52,7 +51,7 @@ public class UserService {
             return createdUser;
         }
         catch(RestClientResponseException err) {
-            System.out.println("Error when creating the channel " + modelUser + ":"+ err.getLocalizedMessage());
+            System.out.println("Error when creating the user " + modelUser + ":"+ err.getLocalizedMessage());
             return null;
         }
         catch(ResourceAccessException err){
@@ -62,10 +61,9 @@ public class UserService {
     }
     public VUser transformUser(ModelUser modelUser) {
         VUser vUser = new VUser();
-        vUser.setUser_link(modelUser.getUri());
+        vUser.setUser_link(modelUser.getLink());
         vUser.setName(modelUser.getName());
         vUser.setPicture_link(modelUser.getPictures().getBaseLink());
-
 
         return vUser;
     }
