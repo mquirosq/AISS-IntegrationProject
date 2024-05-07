@@ -1,5 +1,6 @@
 package aiss.vimeoMiner.service;
 
+import aiss.vimeoMiner.exception.CommentNotFoundException;
 import aiss.vimeoMiner.vimeoModel.modelComment.Comment;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ public class CommentServiceTest {
     CommentService service;
 
     @Test
-    void getComments(){
+    void getComments() throws CommentNotFoundException {
         List<Comment> comments = service.getComments("/videos/371426411/comments");
         comments.forEach(c -> System.out.println(c.getText()));
     }
