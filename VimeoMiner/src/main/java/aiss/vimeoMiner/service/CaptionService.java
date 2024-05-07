@@ -1,13 +1,21 @@
 package aiss.vimeoMiner.service;
 
+import aiss.vimeoMiner.exception.CaptionNotFoundException;
+import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.vimeoMiner.videoModel.VCaption;
+import aiss.vimeoMiner.videoModel.VComment;
+import aiss.vimeoMiner.videoModel.VUser;
 import aiss.vimeoMiner.vimeoModel.modelCaption.Caption;
 import aiss.vimeoMiner.vimeoModel.modelCaption.Captions;
+import aiss.vimeoMiner.vimeoModel.modelComment.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -19,7 +27,7 @@ public class CaptionService {
     @Autowired
     RestTemplate restTemplate;
 
-    public List<Caption> getCaptions(String captionUri){
+    public List<Caption> getCaptions(String captionUri) throws CaptionNotFoundException {
         // URI
         String uri = "https://api.vimeo.com" + captionUri;
 
@@ -32,24 +40,51 @@ public class CaptionService {
         };
 
         // Send message
-        ResponseEntity<Captions> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Captions>(header), Captions.class);
-        Captions captions = response.getBody();
-        List<Caption> captionsArray = new ArrayList<>();
-        if (captions != null){
-            captionsArray = captions.getData();
-        }
-
-        String nextUrl = getNextPageUrl(response.getHeaders());
-        while (nextUrl != null) {
-            response = restTemplate.exchange(nextUrl, HttpMethod.GET, new HttpEntity<Captions>(header), Captions.class);
-            captions = response.getBody();
-            if (captions.getData() != null){
-                captionsArray.addAll(captions.getData());
+        try {
+            ResponseEntity<Captions> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Captions>(header), Captions.class);
+            Captions captions = response.getBody();
+            List<Caption> captionsArray = new ArrayList<>();
+            if (captions != null){
+                captionsArray = captions.getData();
             }
-            nextUrl = getNextPageUrl(response.getHeaders());
+
+            String nextUrl = getNextPageUrl(response.getHeaders());
+            while (nextUrl != null) {
+                response = restTemplate.exchange(nextUrl, HttpMethod.GET, new HttpEntity<Captions>(header), Captions.class);
+                captions = response.getBody();
+                if (captions.getData() != null){
+                    captionsArray.addAll(captions.getData());
+                }
+                nextUrl = getNextPageUrl(response.getHeaders());
+            }
+
+            return captionsArray;
+
+        } catch (RestClientResponseException err){
+            throw new CaptionNotFoundException();
         }
 
-        return captionsArray;
+    }
+
+    //Post to VideoMiner
+    public VCaption createCaption(Caption caption, String videoId) throws VideoMinerConnectionRefusedException {
+        String uri = "http://localhost:8080/videoMiner/v1/videos/" + videoId + "/captions";
+        try {
+            // Convert properties:
+            VCaption vCaption = transformCaption(caption);
+            // Http request
+            HttpEntity<VCaption> request = new HttpEntity<>(vCaption);
+            ResponseEntity<VCaption> response = restTemplate.exchange(uri, HttpMethod.POST, request, VCaption.class);
+            return response.getBody();
+        }
+        catch(RestClientResponseException err) {
+            System.out.println("Error when creating the caption " + caption + ":"+ err.getLocalizedMessage());
+            return null;
+        }
+        catch(ResourceAccessException err){
+            // Catch connection exceptions
+            throw new VideoMinerConnectionRefusedException();
+        }
     }
 
     // Get next page URL
@@ -78,6 +113,14 @@ public class CaptionService {
         }
 
         return result;
+    }
+
+    public VCaption transformCaption(Caption caption){
+        VCaption vCaption = new VCaption();
+        vCaption.setId(caption.getId().toString());
+        vCaption.setName(caption.getName());
+        vCaption.setLanguage(caption.getLanguage());
+        return vCaption;
     }
 
 }
