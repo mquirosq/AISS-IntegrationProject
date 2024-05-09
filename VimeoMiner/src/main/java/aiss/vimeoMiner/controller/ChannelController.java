@@ -19,8 +19,10 @@ import aiss.vimeoMiner.service.ChannelService;
 
 import java.util.List;
 
+import static aiss.vimeoMiner.helper.ConstantsHelper.apiBaseUri;
+
 @RestController
-@RequestMapping("/vimeoMiner/v1/channels")
+@RequestMapping(apiBaseUri)
 public class ChannelController {
     @Autowired
     ChannelService channelService;
@@ -43,7 +45,7 @@ public class ChannelController {
         }
     }
 
-    // TODO: Make it so you can populate with a list of IDs?
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("{channelId}")
     public VChannel populateOne(@PathVariable String channelId,
