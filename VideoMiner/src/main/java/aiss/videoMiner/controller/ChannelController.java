@@ -17,18 +17,18 @@ import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
 @RequestMapping(apiBaseUri+ "/channels")
 public class ChannelController {
     @Autowired
-    ChannelRepository repository;
+    ChannelRepository channelRepository;
 
     // GET all
     @GetMapping
     public List<Channel> findAll(){
-        return repository.findAll();
+        return channelRepository.findAll();
     }
 
     // GET data from a channel
     @GetMapping("/{channelId}")
     public Channel findOne(@PathVariable String channelId) throws ChannelNotFoundException {
-        Optional<Channel> channel = repository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findById(channelId);
         if (!channel.isPresent()){
             throw new ChannelNotFoundException();
         }
@@ -38,9 +38,9 @@ public class ChannelController {
     // POST for Vimeo and YouTube Miners
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Channel create(@Valid @RequestBody Channel channel){
-        Channel _channel = repository
-                .save(new Channel(channel.getId(), channel.getName(), channel.getDescription(), channel.getCreatedTime()));
+    public Channel create(@Valid @RequestBody Channel channel) {
+        Channel _channel = channelRepository
+                .save(channel);
         return _channel;
     }
 }

@@ -32,7 +32,7 @@ public class CommentController {
 
     @GetMapping("/comments/{commentId}")
     public Comment findOne(@PathVariable String commentId) throws CommentNotFoundException {
-        return commentRepository.findById(Long.valueOf(commentId)).orElseThrow(CommentNotFoundException::new);
+        return commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
     }
 
     @GetMapping("/videos/{videoId}/comments")

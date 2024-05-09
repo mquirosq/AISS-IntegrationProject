@@ -31,7 +31,7 @@ public class CaptionController {
 
     @GetMapping("/captions/{captionId}")
     public Caption findOne(@PathVariable String captionId) throws CaptionNotFoundException {
-        return captionRepository.findById(Long.valueOf(captionId)).orElseThrow(CaptionNotFoundException::new);
+        return captionRepository.findById(captionId).orElseThrow(CaptionNotFoundException::new);
     }
 
     @GetMapping("/videos/{videoId}/captions")

@@ -24,7 +24,7 @@ public class VideoController {
     @Autowired
     ChannelRepository channelRepository;
 
-    @GetMapping
+    @GetMapping("/videos")
     public List<Video> findAll() {
         return videoRepository.findAll();
     }

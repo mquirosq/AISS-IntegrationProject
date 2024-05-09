@@ -52,7 +52,7 @@ public class UserController {
     // POST for Vimeo and YouTube Miners
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/comments/{commentId}/user")
-    public User create(@Valid @RequestBody User user, @PathVariable Long commentId) throws CommentNotFoundException {
+    public User create(@Valid @RequestBody User user, @PathVariable String commentId) throws CommentNotFoundException {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         comment.setAuthor(user);
