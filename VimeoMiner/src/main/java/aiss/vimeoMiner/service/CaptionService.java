@@ -62,7 +62,7 @@ public class CaptionService {
 
             return captionsArray;
 
-        } catch (RestClientResponseException err){
+        } catch (HttpClientErrorException.NotFound err){
             throw new CaptionNotFoundException();
         }
 

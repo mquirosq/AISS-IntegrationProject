@@ -3,7 +3,6 @@ package aiss.vimeoMiner.service;
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.vimeoMiner.videoModel.VChannel;
-import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -43,13 +42,11 @@ public class ChannelService {
     }
 
     // Post to VideoMiner:
-    public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
+    public VChannel createChannel(VChannel channel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         String uri = videoMinerBaseUri + "/channels";
         try {
-            // Convert properties:
-            VChannel vChannel = transformChannel(channel);
             // Http request
-            HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
+            HttpEntity<VChannel> request = new HttpEntity<>(channel);
             ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);
             VChannel createdChannel = response.getBody();
             return createdChannel;

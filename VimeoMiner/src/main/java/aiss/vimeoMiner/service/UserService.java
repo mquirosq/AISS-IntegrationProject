@@ -40,7 +40,7 @@ public class UserService {
         try {
             ResponseEntity<ModelUser> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), ModelUser.class);
             return response.getBody();
-        } catch (RestClientResponseException ex) {
+        } catch (HttpClientErrorException.NotFound err) {
             throw new UserNotFoundException();
         }
     }
