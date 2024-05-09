@@ -1,10 +1,22 @@
 package aiss.vimeoMiner.helper;
 
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 
 public class PaginationHelper {
+
+    // Compute page and items per page given a number of items
+    public static Pair<Integer, Integer> getPageAndItemsPerPage(Integer maxItems){
+        Pair<Integer, Integer> pageAndItemsPerPage = null;
+        if (maxItems<100){
+            pageAndItemsPerPage= Pair.of(1, maxItems);
+        }
+        return pageAndItemsPerPage;
+    }
+
+
     // Get next page URL
     public static String getNextPageUrl(HttpHeaders headers) {
         String result = null;
