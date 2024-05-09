@@ -62,11 +62,11 @@ public class ChannelController {
                     commentService.getCommentsFromVideo(x.getId()).forEach( c -> {
                         try {
                             x.getComments().add(commentService.createComment(c, x.getId()));
-                        } catch (VideoMinerConnectionRefusedException e) {
+                        } catch (VideoMinerConnectionRefusedException | VideoCommentsNotFoundException e) {
                             throw new RuntimeException(e);
                         }
                     });
-                } catch (VideoCommentsNotFoundException e) {
+                } catch (VideoCommentsNotFoundException | CommentNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             });

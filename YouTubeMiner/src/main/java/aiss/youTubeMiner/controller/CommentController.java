@@ -19,17 +19,12 @@ public class CommentController {
     CommentService commentService;
 
     @GetMapping("/comments/{commentId}")
-    public List<Comment> getComment(@PathVariable String commentId) throws CommentNotFoundException {
+    public Comment getComment(@PathVariable String commentId) throws CommentNotFoundException {
         return commentService.getComment(commentId);
     }
 
-    @GetMapping("/comments/{commentId}/user")
-    public VUser getUser(@PathVariable String commentId) throws CommentNotFoundException {
-        return commentService.getUser(commentId);
-    }
-
     @GetMapping("/videos/{videoId}/comments")
-    public List<Comment> getCommentsFromVideo(@PathVariable String videoId) throws VideoCommentsNotFoundException {
+    public List<Comment> getCommentsFromVideo(@PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
         return commentService.getCommentsFromVideo(videoId);
     }
 

@@ -24,15 +24,16 @@ public class CommentService {
 
     public VUser getUser(String commentsId) throws CommentNotFoundException {
         try {
-            List<Comment> ls = getComment(commentsId);
-            return mapUser(Objects.requireNonNull(ls.stream().findFirst().orElse(null)));
+            Comment cm = getComment(commentsId);
+            return transformUser(cm);
         } catch (CommentNotFoundException e) {
             throw new CommentNotFoundException();
         }
     }
 
-    public List<Comment> getComment(String commentsId) throws CommentNotFoundException {
-        List<Comment> out = new ArrayList<>();
+    public Comment getComment(String commentsId) throws CommentNotFoundException {
+        List<Comment> aux = new ArrayList<>();
+        Comment out = new Comment();
 
         String uri = Constants.ytBase + "/commentThreads";
         uri += ("?id=" + commentsId);
@@ -51,7 +52,8 @@ public class CommentService {
 
         try {
             if (response.getBody() != null) {
-                out.addAll(response.getBody().getItems());
+                aux.addAll(response.getBody().getItems());
+                out = Objects.requireNonNull(aux.stream().findFirst().orElse(null));
             }
 
             String next = getNextPage(uri, response);
@@ -60,17 +62,18 @@ public class CommentService {
                 response = restTemplate.exchange(next, HttpMethod.GET, null, CommentSearch.class);
 
                 if (response.getBody() != null) {
-                    out.addAll(response.getBody().getItems());
+                    aux.addAll(response.getBody().getItems());
+                    out = Objects.requireNonNull(aux.stream().findFirst().orElse(null));
                 }
                 next = getNextPage(uri, response);
             }
-        } catch (RestClientResponseException e) {
+        } catch (RestClientResponseException | NullPointerException e) {
             throw new CommentNotFoundException();
         }
         return out;
     }
 
-    public List<Comment> getCommentsFromVideo(String videoId) throws VideoCommentsNotFoundException {
+    public List<Comment> getCommentsFromVideo(String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> out = new ArrayList<>();
 
         String uri = Constants.ytBase + "/commentThreads";
@@ -113,14 +116,20 @@ public class CommentService {
                 }
                 next = getNextPage(uri, response);
             }
-        } catch (RestClientResponseException e) {
-            throw new VideoCommentsNotFoundException();
+        } catch (RestClientResponseException | CommentNotFoundException | NullPointerException e) {
+            throw new CommentNotFoundException();
         }
         return out;
     }
 
-    public String getNextPage(String uri, ResponseEntity<CommentSearch> response) {
-        String next = response.getBody().getNextPageToken();
+    public String getNextPage(String uri, ResponseEntity<CommentSearch> response) throws CommentNotFoundException {
+        String next = null;
+
+        try {
+            next = response.getBody().getNextPageToken();
+        } catch (NullPointerException e) {
+            throw new CommentNotFoundException();
+        }
 
         if (next == null) {
             return null;
@@ -128,22 +137,21 @@ public class CommentService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException {
+    public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException, VideoCommentsNotFoundException {
         try {
             String uri = Constants.vmBase + "/videos/" + videoId + "/comments";
-            VComment vComment = mapComment(comment);
+            VComment vComment = transformComment(comment);
             HttpEntity<VComment> request = new HttpEntity<>(vComment);
             ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
             return response.getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Error creating the comment: " + e.getLocalizedMessage());
-            return null;
+        } catch(HttpClientErrorException.NotFound e) {
+            throw new VideoCommentsNotFoundException();
         } catch (ResourceAccessException e) {
             throw new VideoMinerConnectionRefusedException();
         }
     }
     
-    public VUser createUser(String commentId) throws VideoMinerConnectionRefusedException {
+    public VUser createUser(String commentId) throws VideoMinerConnectionRefusedException, CommentNotFoundException {
         try {
             String uri = Constants.vmBase + "/comments/" + commentId + "/user";
             VUser vUser = getUser(commentId);
@@ -152,17 +160,16 @@ public class CommentService {
             return response.getBody();
         } catch (ResourceAccessException e) {
             throw new VideoMinerConnectionRefusedException();
-        } catch (RestClientResponseException e) {
-            System.out.println("Error creating the user: " + e.getLocalizedMessage());
-            return null;
+        } catch(HttpClientErrorException.NotFound e) {
+            throw new CommentNotFoundException();
         } catch (CommentNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private VComment mapComment(Comment comment) {
+    private VComment transformComment(Comment comment) {
         VComment out = new VComment();
-        VUser aux = mapUser(comment);
+        VUser aux = transformUser(comment);
         out.setId(comment.getCommentSnippet().getTopLevelComment().getId());
         out.setAuthor(aux);
         out.setText(comment.getCommentSnippet().getTopLevelComment().getSnippet().getTextOriginal());
@@ -170,7 +177,7 @@ public class CommentService {
         return out;
     }
 
-    private VUser mapUser(Comment comment) {
+    private VUser transformUser(Comment comment) {
         VUser out = new VUser();
         out.setName(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
         out.setPicture_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());
