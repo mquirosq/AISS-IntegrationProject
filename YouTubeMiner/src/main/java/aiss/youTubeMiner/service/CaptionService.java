@@ -2,18 +2,18 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CaptionNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VCaption;
-import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
 import aiss.youTubeMiner.youTubeModel.caption.CaptionSearch;
-import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -47,22 +47,21 @@ public class CaptionService {
         }
     }
 
-    public VCaption createCaption(String videoId, Caption caption) throws VideoMinerConnectionRefusedException {
+    public VCaption createCaption(String videoId, Caption caption) throws VideoMinerConnectionRefusedException, VideoNotFoundException {
         try {
             String uri = Constants.vmBase + "/videos/" + videoId + "/captions";
-            VCaption vCaption = mapCaption(caption);
+            VCaption vCaption = transformCaption(caption);
             HttpEntity<VCaption> request = new HttpEntity<>(vCaption);
             ResponseEntity<VCaption> response = restTemplate.exchange(uri, HttpMethod.POST, request, VCaption.class);
             return response.getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Error creating caption: " + e.getLocalizedMessage());
-            return null;
+        } catch(HttpClientErrorException.NotFound e) {
+            throw new VideoNotFoundException();
         } catch (ResourceAccessException e) {
             throw new VideoMinerConnectionRefusedException();
         }
     }
 
-    private VCaption mapCaption(Caption caption) {
+    private VCaption transformCaption(Caption caption) {
         VCaption out = new VCaption();
         out.setId(caption.getId());
         out.setName(caption.getSnippet().getName());

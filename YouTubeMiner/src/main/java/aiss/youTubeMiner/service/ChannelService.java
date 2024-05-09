@@ -4,18 +4,17 @@ import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VChannel;
-import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.youTubeModel.channel.ChannelSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ChannelService {
@@ -44,22 +43,21 @@ public class ChannelService {
         }
     }
 
-    public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException {
+    public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         try {
             String uri = Constants.vmBase + "/channels";
-            VChannel vChannel = mapChannel(channel);
+            VChannel vChannel = transformChannel(channel);
             HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
             ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);
             return response.getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Error creating channel: " + e.getLocalizedMessage());
-            return null;
+        } catch(HttpClientErrorException.NotFound e) {
+            throw new ChannelNotFoundException();
         } catch (ResourceAccessException e) {
             throw new VideoMinerConnectionRefusedException();
         }
     }
 
-    private VChannel mapChannel(Channel channel) {
+    private VChannel transformChannel(Channel channel) {
         VChannel out = new VChannel();
         out.setId(channel.getId());
         out.setDescription(channel.getSnippet().getDescription());
