@@ -22,6 +22,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 
+import static aiss.vimeoMiner.helper.AuthenticationHelper.createHttpHeaderAuthentication;
+import static aiss.vimeoMiner.helper.ConstantsHelper.videoMinerBaseUri;
+import static aiss.vimeoMiner.helper.ConstantsHelper.vimeoBaseUri;
+
 @Service
 public class UserService {
 
@@ -29,10 +33,9 @@ public class UserService {
     private RestTemplate restTemplate;
 
     public ModelUser getUser(String userUri) throws UserNotFoundException {
-        String uri = "https://api.vimeo.com" + userUri;
+        String uri = vimeoBaseUri + userUri;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer ee507ffdb4da956d56252e8eb067fb58");
+        HttpHeaders headers = createHttpHeaderAuthentication();
 
         try {
             ResponseEntity<ModelUser> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), ModelUser.class);
@@ -42,7 +45,7 @@ public class UserService {
         }
     }
     public VUser createUser(ModelUser modelUser) throws VideoMinerConnectionRefusedException, CommentNotFoundException {
-        String uri = "http://localhost:8080/videoMiner/v1/users";
+        String uri = videoMinerBaseUri + "/users";
         try {
             // Convert properties:
             VUser vUser = transformUser(modelUser);
@@ -57,7 +60,6 @@ public class UserService {
         }
         // Catch connection exceptions
         catch(ResourceAccessException err){
-
             throw new VideoMinerConnectionRefusedException();
         }
     }

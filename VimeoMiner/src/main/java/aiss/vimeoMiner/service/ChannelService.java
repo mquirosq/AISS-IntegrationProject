@@ -1,21 +1,20 @@
 package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
-import aiss.vimeoMiner.exception.GlobalExceptionHandler;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
-import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.videoModel.VChannel;
 import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.*;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
+
+import static aiss.vimeoMiner.helper.AuthenticationHelper.createHttpHeaderAuthentication;
+import static aiss.vimeoMiner.helper.ConstantsHelper.videoMinerBaseUri;
+import static aiss.vimeoMiner.helper.ConstantsHelper.vimeoBaseUri;
 
 
 @Service
@@ -26,15 +25,10 @@ public class ChannelService {
     // Get from Vimeo API
     public Channel getChannel(String channelId) throws ChannelNotFoundException {
         // URI
-        String uri = "https://api.vimeo.com/channels/" + channelId;
+        String uri = vimeoBaseUri + "/channels/" + channelId;
 
         // Header for authentication
-        HttpHeaders header = new HttpHeaders(){
-            {
-                String auth = "Bearer ee507ffdb4da956d56252e8eb067fb58";
-                set("Authorization", auth);
-            }
-        };
+        HttpHeaders header = createHttpHeaderAuthentication();
 
         // Send message
         try {
@@ -50,7 +44,7 @@ public class ChannelService {
 
     // Post to VideoMiner:
     public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
-        String uri = "http://localhost:8080/videoMiner/v1/channels";
+        String uri = videoMinerBaseUri + "/channels";
         try {
             // Convert properties:
             VChannel vChannel = transformChannel(channel);
@@ -65,7 +59,6 @@ public class ChannelService {
         }
         // Catch connection exceptions
         catch(ResourceAccessException err){
-
             throw new VideoMinerConnectionRefusedException();
         }
     }
@@ -76,7 +69,7 @@ public class ChannelService {
         vChannel.setName(channel.getName());
         vChannel.setDescription(channel.getDescription() == null? null:channel.getDescription().toString());
         vChannel.setCreatedTime(channel.getCreatedTime());
-        vChannel.setVideos(new ArrayList<VVideo>());
+        vChannel.setVideos(new ArrayList<>());
 
         return vChannel;
     }

@@ -23,6 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static aiss.vimeoMiner.helper.AuthenticationHelper.createHttpHeaderAuthentication;
+import static aiss.vimeoMiner.helper.ConstantsHelper.videoMinerBaseUri;
+import static aiss.vimeoMiner.helper.ConstantsHelper.vimeoBaseUri;
+import static aiss.vimeoMiner.helper.PaginationHelper.getNextPageUrl;
+
 @Service
 public class VideoService {
     @Autowired
@@ -31,15 +36,10 @@ public class VideoService {
     // Get from Vimeo API
     public List<Video> getVideos(String videosUri) throws VideoNotFoundException {
         // URI
-        String uri = "https://api.vimeo.com" + videosUri;
+        String uri = vimeoBaseUri + videosUri;
 
         // Header for authentication
-        HttpHeaders header = new HttpHeaders(){
-            {
-                String auth = "Bearer ee507ffdb4da956d56252e8eb067fb58";
-                set("Authorization", auth);
-            }
-        };
+        HttpHeaders header = createHttpHeaderAuthentication();
 
         // Send message
         try {
@@ -67,7 +67,7 @@ public class VideoService {
 
     // Post to VideoMiner:
     public VVideo createVideo(Video video, String channelId) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
-        String uri = "http://localhost:8080/videoMiner/v1/channels/" + channelId + "/videos";
+        String uri = videoMinerBaseUri + "/channels/" + channelId + "/videos";
         try {
             // Convert properties:
             VVideo vVideo = transformVideo(video);
@@ -84,36 +84,6 @@ public class VideoService {
             // Catch connection exceptions
             throw new VideoMinerConnectionRefusedException();
         }
-    }
-
-
-
-    // Get next page URL
-    public static String getNextPageUrl(HttpHeaders headers) {
-        String result = null;
-
-        // If there is no link header, return null
-        List<String> linkHeader = headers.get("Link");
-        if (linkHeader == null)
-            return null;
-
-        // If the header contains no links, return null
-        String links = linkHeader.get(0);
-        if (links == null || links.isEmpty())
-            return null;
-
-        // Return the next page URL or null if none.
-        for (String token : links.split(", ")) {
-            if (token.endsWith("rel=\"next\"")) {
-                // Found the next page. This should look something like
-                // <https://api.github.com/repos?page=3&per_page=100>; rel="next"
-                int idx = token.indexOf('>');
-                result = token.substring(1, idx);
-                break;
-            }
-        }
-
-        return result;
     }
 
     public VVideo transformVideo(Video video){
