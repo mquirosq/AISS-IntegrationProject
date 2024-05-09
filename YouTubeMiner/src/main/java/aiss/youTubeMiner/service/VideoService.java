@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.service;
 
+import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.helper.Constants;
@@ -73,16 +74,15 @@ public class VideoService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VVideo createVideo(String channelId, VideoSnippet video) throws VideoMinerConnectionRefusedException {
+    public VVideo createVideo(String channelId, VideoSnippet video) throws ChannelNotFoundException, VideoMinerConnectionRefusedException {
         try {
             String uri = Constants.vmBase + "/channels/" + channelId + "/videos";
             VVideo vVideo = mapVideo(video);
             HttpEntity<VVideo> request = new HttpEntity<>(vVideo);
             ResponseEntity<VVideo> response = restTemplate.exchange(uri, HttpMethod.POST, request, VVideo.class);
             return response.getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("Error creating video: " + e.getLocalizedMessage());
-            return null;
+        } catch(HttpClientErrorException.NotFound e) {
+            throw new ChannelNotFoundException();
         } catch (ResourceAccessException e) {
             throw new VideoMinerConnectionRefusedException();
         }
