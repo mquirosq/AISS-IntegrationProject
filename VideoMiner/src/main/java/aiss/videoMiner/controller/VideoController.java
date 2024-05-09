@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
+
 @RestController
-@RequestMapping("/videoMiner/v1")
+@RequestMapping(apiBaseUri)
 public class VideoController {
     @Autowired
     VideoRepository videoRepository;

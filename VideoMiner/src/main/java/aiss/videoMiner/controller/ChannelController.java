@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
+
 @RestController
-@RequestMapping("/videoMiner/v1/channels")
+@RequestMapping(apiBaseUri+ "/channels")
 public class ChannelController {
     @Autowired
     ChannelRepository repository;

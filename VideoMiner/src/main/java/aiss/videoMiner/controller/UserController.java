@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
+
 @RestController
-@RequestMapping("/videoMiner/v1")
+@RequestMapping(apiBaseUri)
 public class UserController {
     @Autowired
     UserRepository userRepository;
@@ -49,11 +51,14 @@ public class UserController {
 
     // POST for Vimeo and YouTube Miners
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/users")
-    public User create(@Valid @RequestBody User user){
-        User _user = userRepository
-                .save(new User(user.getName(), user.getUser_link(), user.getPicture_link()));
-        return _user;
+    @PostMapping("/comments/{commentId}/user")
+    public User create(@Valid @RequestBody User user, @PathVariable Long commentId) throws CommentNotFoundException {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        comment.setAuthor(user);
+
+        commentRepository.save(comment);
+        return userRepository.save(user);
     }
 
 
