@@ -20,38 +20,44 @@ public class VideoService {
     @Autowired
     RestTemplate restTemplate;
 
-    public List<VideoSnippet> getVideos(String channelId) throws VideoNotFoundException {
+    private String genURI(String channelId, Integer maxVideos) {
         String uri = Constants.ytBase + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
+        uri += ("&maxResults=" + ((maxVideos > 50) ? 50 : maxVideos));
         uri += ("&key=" + Constants.apiKey);
+        return uri;
+    }
 
+    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos) throws VideoNotFoundException {
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<VideoSnippetSearch> request = new HttpEntity<>(headers);
 
         try {
+            List<VideoSnippet> out = null;
+            String next = null;
             ResponseEntity<VideoSnippetSearch> response = restTemplate.exchange(
-                    uri,
+                    genURI(channelId, maxVideos),
                     HttpMethod.GET,
                     request,
                     VideoSnippetSearch.class
             );
-            List<VideoSnippet> out = new ArrayList<>();
-            String next = null;
 
             if (response.getBody() != null) {
-                out.addAll(response.getBody().getItems());
-                next = getNextPage(uri, response);
+                out = new ArrayList<>(response.getBody().getItems());
+            } else {
+                return null;
             }
+            next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
 
-            while (next != null) {
-                response = restTemplate.exchange(next, HttpMethod.GET, null, VideoSnippetSearch.class);
+            while (out.size() < maxVideos && next != null) {
+                response = restTemplate.exchange(next, HttpMethod.GET, request, VideoSnippetSearch.class);
 
                 if (response.getBody() != null) {
                     out.addAll(response.getBody().getItems());
                 }
-                next = getNextPage(uri, response);
+                next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
             }
             return out;
         } catch (RestClientResponseException e) {

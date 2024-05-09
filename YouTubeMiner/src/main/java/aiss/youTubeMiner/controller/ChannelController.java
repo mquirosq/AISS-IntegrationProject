@@ -48,10 +48,10 @@ public class ChannelController {
         VChannel out = channelService.createChannel(channel);
 
         if (maxVideos > 0) {
-            videoService.getVideos(channelId).subList(0,maxVideos).forEach(x -> {
+            videoService.getVideos(channelId, maxVideos).forEach(x -> {
                 try {
                     out.getVideos().add(videoService.createVideo(out.getId(), x));
-                } catch (VideoMinerConnectionRefusedException e) {
+                } catch (ChannelNotFoundException|VideoMinerConnectionRefusedException e) {
                     throw new RuntimeException(e);
                 }
             });

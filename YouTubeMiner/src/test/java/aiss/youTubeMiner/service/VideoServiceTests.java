@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.service;
 
+import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.videoModel.VVideo;
@@ -23,27 +24,27 @@ public class VideoServiceTests {
 
     @Test
     void getVideosPositive() throws VideoNotFoundException {
-        List<VideoSnippet> videos = videoService.getVideos(channelId);
+        List<VideoSnippet> videos = videoService.getVideos(channelId, 10);
         assertFalse(videos.isEmpty());
         videos.forEach(Assertions::assertNotNull);
     }
 
     @Test
     void getVideosNegative() {
-        assertThrows(VideoNotFoundException.class, ()->videoService.getVideos("foo"));
+        assertThrows(VideoNotFoundException.class, ()->videoService.getVideos("foo", 10));
     }
 
     @Test
-    void createVideos() throws VideoNotFoundException, VideoMinerConnectionRefusedException {
-        List<VideoSnippet> videos = videoService.getVideos(channelId);
-        List<VVideo> videosRes = videos.stream().map(x-> {
-            try {
-                return videoService.createVideo(channelId, x);
-            } catch (VideoMinerConnectionRefusedException e) {
-                throw new RuntimeException(e);
-            }
-        })
-        .toList();
+    void createVideos() throws VideoNotFoundException {
+        List<VideoSnippet> videos = videoService.getVideos(channelId, 70);
+        List<VVideo> videosRes = videos.stream().map(x -> {
+                    try {
+                        return videoService.createVideo(channelId, x);
+                    } catch (ChannelNotFoundException|VideoMinerConnectionRefusedException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
 
         assertFalse(videosRes.isEmpty());
 
