@@ -83,7 +83,7 @@ public class VideoService {
     public VVideo createVideo(String channelId, VideoSnippet video) throws ChannelNotFoundException, VideoMinerConnectionRefusedException {
         try {
             String uri = Constants.vmBase + "/channels/" + channelId + "/videos";
-            VVideo vVideo = mapVideo(video);
+            VVideo vVideo = transformVideo(video);
             HttpEntity<VVideo> request = new HttpEntity<>(vVideo);
             ResponseEntity<VVideo> response = restTemplate.exchange(uri, HttpMethod.POST, request, VVideo.class);
             return response.getBody();
@@ -94,7 +94,7 @@ public class VideoService {
         }
     }
 
-    private VVideo mapVideo(VideoSnippet video) {
+    private VVideo transformVideo(VideoSnippet video) {
         VVideo out = new VVideo();
         out.setId(video.getId().toString());
         out.setName(video.getSnippet().getTitle());
