@@ -2,6 +2,7 @@ package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.CaptionNotFoundException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.videoModel.VCaption;
 import aiss.vimeoMiner.videoModel.VComment;
 import aiss.vimeoMiner.videoModel.VUser;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -67,7 +69,7 @@ public class CaptionService {
     }
 
     //Post to VideoMiner
-    public VCaption createCaption(Caption caption, String videoId) throws VideoMinerConnectionRefusedException {
+    public VCaption createCaption(Caption caption, String videoId) throws VideoMinerConnectionRefusedException, VideoNotFoundException {
         String uri = "http://localhost:8080/videoMiner/v1/videos/" + videoId + "/captions";
         try {
             // Convert properties:
@@ -77,12 +79,12 @@ public class CaptionService {
             ResponseEntity<VCaption> response = restTemplate.exchange(uri, HttpMethod.POST, request, VCaption.class);
             return response.getBody();
         }
-        catch(RestClientResponseException err) {
-            System.out.println("Error when creating the caption " + caption + ":"+ err.getLocalizedMessage());
-            return null;
+        catch(HttpClientErrorException.NotFound e) {
+            throw new VideoNotFoundException();
         }
+        // Catch connection exceptions
         catch(ResourceAccessException err){
-            // Catch connection exceptions
+
             throw new VideoMinerConnectionRefusedException();
         }
     }

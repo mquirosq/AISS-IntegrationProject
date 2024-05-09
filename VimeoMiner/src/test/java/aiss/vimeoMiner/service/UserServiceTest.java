@@ -1,9 +1,7 @@
 package aiss.vimeoMiner.service;
 
-import aiss.vimeoMiner.exception.ChannelNotFoundException;
+import aiss.vimeoMiner.exception.*;
 import aiss.vimeoMiner.exception.UserNotFoundException;
-import aiss.vimeoMiner.exception.UserNotFoundException;
-import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.vimeoMiner.service.UserService;
 import aiss.vimeoMiner.videoModel.VUser;
 import aiss.vimeoMiner.vimeoModel.modelUser.ModelUser;
@@ -43,7 +41,7 @@ public class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUser(userURI));
     }
     @Test
-    void createUser() throws VideoMinerConnectionRefusedException, UserNotFoundException{
+    void createUser() throws VideoMinerConnectionRefusedException, UserNotFoundException, CommentNotFoundException {
         ModelUser modelUser=userService.getUser("/users/5241831");
         VUser createdUser = userService.createUser(modelUser);
         assertNotNull(createdUser.getName());

@@ -2,6 +2,7 @@ package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.CommentNotFoundException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.videoModel.VComment;
 import aiss.vimeoMiner.videoModel.VUser;
 import aiss.vimeoMiner.videoModel.VVideo;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -66,7 +68,7 @@ public class CommentService {
     }
 
     //Post to VideoMiner
-    public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException {
+    public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException, VideoNotFoundException {
         String uri = "http://localhost:8080/videoMiner/v1/videos/" + videoId + "/comments";
         try {
             // Convert properties:
@@ -76,12 +78,12 @@ public class CommentService {
             ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
             return response.getBody();
         }
-        catch(RestClientResponseException err) {
-            System.out.println("Error when creating the comment " + comment + ":"+ err.getLocalizedMessage());
-            return null;
+        catch(HttpClientErrorException.NotFound e) {
+            throw new VideoNotFoundException();
         }
+        // Catch connection exceptions
         catch(ResourceAccessException err){
-            // Catch connection exceptions
+
             throw new VideoMinerConnectionRefusedException();
         }
     }

@@ -3,6 +3,7 @@ package aiss.vimeoMiner.service;
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
 import aiss.vimeoMiner.exception.GlobalExceptionHandler;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.videoModel.VChannel;
 import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
@@ -11,10 +12,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -51,7 +49,7 @@ public class ChannelService {
     }
 
     // Post to VideoMiner:
-    public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException {
+    public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         String uri = "http://localhost:8080/videoMiner/v1/channels";
         try {
             // Convert properties:
@@ -62,12 +60,12 @@ public class ChannelService {
             VChannel createdChannel = response.getBody();
             return createdChannel;
         }
-        catch(RestClientResponseException err) {
-            System.out.println("Error when creating the channel " + channel + ":"+ err.getLocalizedMessage());
-            return null;
+        catch(HttpClientErrorException.NotFound e) {
+            throw new ChannelNotFoundException();
         }
+        // Catch connection exceptions
         catch(ResourceAccessException err){
-            // Catch connection exceptions
+
             throw new VideoMinerConnectionRefusedException();
         }
     }

@@ -1,6 +1,7 @@
 package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
+import aiss.vimeoMiner.exception.CommentNotFoundException;
 import aiss.vimeoMiner.exception.UserNotFoundException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.vimeoMiner.videoModel.VChannel;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -39,7 +41,7 @@ public class UserService {
             throw new UserNotFoundException();
         }
     }
-    public VUser createUser(ModelUser modelUser) throws  VideoMinerConnectionRefusedException {
+    public VUser createUser(ModelUser modelUser) throws VideoMinerConnectionRefusedException, CommentNotFoundException {
         String uri = "http://localhost:8080/videoMiner/v1/users";
         try {
             // Convert properties:
@@ -50,12 +52,12 @@ public class UserService {
             VUser createdUser = response.getBody();
             return createdUser;
         }
-        catch(RestClientResponseException err) {
-            System.out.println("Error when creating the user " + modelUser + ":"+ err.getLocalizedMessage());
-            return null;
+        catch(HttpClientErrorException.NotFound e) {
+            throw new CommentNotFoundException();
         }
+        // Catch connection exceptions
         catch(ResourceAccessException err){
-            // Catch connection exceptions
+
             throw new VideoMinerConnectionRefusedException();
         }
     }

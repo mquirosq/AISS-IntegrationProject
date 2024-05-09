@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -65,7 +66,7 @@ public class VideoService {
     }
 
     // Post to VideoMiner:
-    public VVideo createVideo(Video video, String channelId) throws VideoMinerConnectionRefusedException {
+    public VVideo createVideo(Video video, String channelId) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         String uri = "http://localhost:8080/videoMiner/v1/channels/" + channelId + "/videos";
         try {
             // Convert properties:
@@ -76,9 +77,8 @@ public class VideoService {
             VVideo createdVideo = response.getBody();
             return createdVideo;
         }
-        catch(RestClientResponseException err) {
-            System.out.println("Error when creating the video " + video + ":"+ err.getLocalizedMessage());
-            return null;
+        catch(HttpClientErrorException.NotFound e) {
+            throw new ChannelNotFoundException();
         }
         catch(ResourceAccessException err){
             // Catch connection exceptions
