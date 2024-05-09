@@ -1,9 +1,7 @@
 package aiss.vimeoMiner.controller;
 
 import aiss.vimeoMiner.exception.*;
-import aiss.vimeoMiner.service.CaptionService;
-import aiss.vimeoMiner.service.CommentService;
-import aiss.vimeoMiner.service.VideoService;
+import aiss.vimeoMiner.service.*;
 import aiss.vimeoMiner.videoModel.VCaption;
 import aiss.vimeoMiner.videoModel.VChannel;
 import aiss.vimeoMiner.videoModel.VComment;
@@ -15,14 +13,14 @@ import aiss.vimeoMiner.vimeoModel.modelVideos.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import aiss.vimeoMiner.service.ChannelService;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
 import static aiss.vimeoMiner.helper.ConstantsHelper.apiBaseUri;
 
 @RestController
-@RequestMapping(apiBaseUri)
+@RequestMapping(apiBaseUri + "/channels")
 public class ChannelController {
     @Autowired
     ChannelService channelService;
@@ -32,16 +30,18 @@ public class ChannelController {
     CaptionService captionService;
     @Autowired
     CommentService commentService;
+    @Autowired
+    UserService userService;
 
     @GetMapping("{channelId}")
-    public VChannel findOne(@PathVariable Long channelId) throws ChannelNotFoundException {
+    public VChannel findOne(@PathVariable String channelId) throws ChannelNotFoundException {
         try{
-            Channel channel = channelService.getChannel(String.valueOf(channelId));
+            Channel channel = channelService.getChannel(channelId);
             VChannel vChannel = channelService.transformChannel(channel);
             return vChannel;
         }
-        catch (Exception err){
-            throw err;
+        catch(HttpClientErrorException.NotFound e) {
+            throw new ChannelNotFoundException();
         }
     }
 
@@ -53,29 +53,28 @@ public class ChannelController {
                                 @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
             throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException {
 
-        Channel channel = channelService.getChannel(String.valueOf(channelId));
-        VChannel createdChannel = channelService.createChannel(channel);
-        if (maxVideos > 0){
-            List<Video> videos = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri());
-            for (Video v : videos.subList(0, Math.min(maxVideos, videos.size()))) {
-                if (v != null) {
-                    VVideo vVideo = videoService.createVideo(v, channelId);
-                    createdChannel.getVideos().add(vVideo);
+        Channel channel = channelService.getChannel(channelId);
+        VChannel vChannel = channelService.transformChannel(channel);
 
-                    List<Caption> captions = captionService.getCaptions(v.getMetadata().getConnections().getTexttracks().getUri());
-                    for (Caption caption : captions){
-                        VCaption vCaption = captionService.createCaption(caption, vVideo.getId());
-                        vVideo.getCaptions().add(vCaption);
-                    }
+        List<Video> videos = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri(), maxVideos);
+        for (Video v : videos) {
+            VVideo vVideo = videoService.transformVideo(v);
 
-                    List<Comment> comments = commentService.getComments(v.getMetadata().getConnections().getComments().getUri());
-                    for (Comment comment : comments.subList(0, Math.min(maxComments, comments.size()))){
-                        VComment vComment = commentService.createComment(comment, vVideo.getId());
-                        vVideo.getComments().add(vComment);
-                    }
-                }
+            List<Caption> captions = captionService.getCaptions(v.getMetadata().getConnections().getTexttracks().getUri());
+            for (Caption caption : captions) {
+                VCaption vCaption = captionService.transformCaption(caption);
+                vVideo.getCaptions().add(vCaption);
             }
+
+            List<Comment> comments = commentService.getComments(v.getMetadata().getConnections().getComments().getUri(), maxComments);
+            for (Comment comment : comments) {
+                VComment vComment = commentService.transformComment(comment);
+
+                vVideo.getComments().add(vComment);
+            }
+            vChannel.getVideos().add(vVideo);
         }
+        VChannel createdChannel = channelService.createChannel(vChannel);
         return createdChannel;
     }
 }

@@ -27,7 +27,7 @@ class VideoServiceTest {
     // GET from Vimeo tests:
     @Test
     void getVideos() throws VideoNotFoundException {
-        List<Video> videos = videoService.getVideos("/channels/1903455/videos");
+        List<Video> videos = videoService.getVideos("/channels/1903455/videos", 10);
         assertNotEquals(new ArrayList<>(), videos);
         videos.forEach(v -> {
             assertNotNull(v.getName());
@@ -37,7 +37,7 @@ class VideoServiceTest {
     @Test
     void getChannelNotFound(){
         String uri = "/channels/1/videos";
-        assertThrows(VideoNotFoundException.class, () -> videoService.getVideos(uri));
+        assertThrows(VideoNotFoundException.class, () -> videoService.getVideos(uri, 10));
     }
 
     // Create test:
@@ -45,7 +45,7 @@ class VideoServiceTest {
     void createVideo() throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException {
         String channelId = "1901688";
         Channel channel = channelService.getChannel(channelId);
-        List<Video> videoList = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri());
+        List<Video> videoList = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri(), 10);
         for (Video v : videoList){
             if (v != null) {
                 VVideo vVideo = videoService.createVideo(v, channelId);

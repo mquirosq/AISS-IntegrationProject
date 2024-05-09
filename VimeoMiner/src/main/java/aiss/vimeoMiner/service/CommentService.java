@@ -8,6 +8,7 @@ import aiss.vimeoMiner.videoModel.VUser;
 import aiss.vimeoMiner.vimeoModel.modelComment.Comments;
 import aiss.vimeoMiner.vimeoModel.modelComment.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,7 @@ import java.util.List;
 import static aiss.vimeoMiner.helper.AuthenticationHelper.createHttpHeaderAuthentication;
 import static aiss.vimeoMiner.helper.ConstantsHelper.*;
 import static aiss.vimeoMiner.helper.PaginationHelper.getNextPageUrl;
+import static aiss.vimeoMiner.helper.PaginationHelper.getPageAndItemsPerPage;
 
 @Service
 public class CommentService {
@@ -31,9 +33,13 @@ public class CommentService {
     @Autowired
     RestTemplate restTemplate;
 
-    public List<Comment> getComments(String commentUri) throws CommentNotFoundException {
+    public List<Comment> getComments(String commentUri, Integer maxComments) throws CommentNotFoundException {
+        // Get pagination (max)
+        Pair<Integer, Integer> pageAndItemsPerPage = getPageAndItemsPerPage(maxComments);
+        String paginationParams = pageAndItemsPerPage == null? "": "?page=" + pageAndItemsPerPage.getFirst() + "&per_page=" + pageAndItemsPerPage.getSecond();
+
         // URI
-        String uri = vimeoBaseUri + commentUri;
+        String uri = vimeoBaseUri + commentUri + paginationParams;
 
         // Header for authentication
         HttpHeaders header = createHttpHeaderAuthentication();
@@ -43,23 +49,13 @@ public class CommentService {
             ResponseEntity<Comments> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Comments>(header), Comments.class);
             Comments comments = response.getBody();
             List<Comment> commentsArray = new ArrayList<>();
-            if (comments != null){
+            if (comments != null) {
                 commentsArray = comments.getData();
             }
-
-            String nextUrl = getNextPageUrl(response.getHeaders());
-            while (nextUrl != null) {
-                response = restTemplate.exchange(nextUrl, HttpMethod.GET, new HttpEntity<Comments>(header), Comments.class);
-                comments = response.getBody();
-                if (comments.getData() != null){
-                    commentsArray.addAll(comments.getData());
-                }
-                nextUrl = getNextPageUrl(response.getHeaders());
-            }
             return commentsArray;
-
-        } catch (RestClientResponseException err){
-            throw new CommentNotFoundException();
+        }
+        catch(HttpClientErrorException.NotFound err) {
+                throw new CommentNotFoundException();
         }
     }
 
@@ -87,7 +83,7 @@ public class CommentService {
         VComment vComment = new VComment();
         VUser vUser = new VUser();
         vUser.setName(comment.getUser().getName());
-        vUser.setPicture_link(comment.getUser().getPictures().getUri().split("/")[4]);
+        vUser.setPicture_link(comment.getUser().getPictures().getBaseLink());
         vUser.setUser_link(comment.getLink());
         vComment.setId(comment.getUri().split("/")[4]);
         vComment.setAuthor(vUser);

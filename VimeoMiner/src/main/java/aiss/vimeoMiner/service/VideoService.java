@@ -7,6 +7,7 @@ import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Video;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,16 +28,22 @@ import static aiss.vimeoMiner.helper.AuthenticationHelper.createHttpHeaderAuthen
 import static aiss.vimeoMiner.helper.ConstantsHelper.videoMinerBaseUri;
 import static aiss.vimeoMiner.helper.ConstantsHelper.vimeoBaseUri;
 import static aiss.vimeoMiner.helper.PaginationHelper.getNextPageUrl;
+import static aiss.vimeoMiner.helper.PaginationHelper.getPageAndItemsPerPage;
 
 @Service
 public class VideoService {
     @Autowired
     RestTemplate restTemplate;
+    private Pair<Integer, Integer> pageAndItemsPerPage;
 
     // Get from Vimeo API
-    public List<Video> getVideos(String videosUri) throws VideoNotFoundException {
+    public List<Video> getVideos(String videosUri, Integer maxVideos) throws VideoNotFoundException {
+        // Get pagination (max)
+        Pair<Integer, Integer> pageAndItemsPerPage = getPageAndItemsPerPage(maxVideos);
+        String paginationParams = pageAndItemsPerPage == null? "": "?page=" + pageAndItemsPerPage.getFirst() + "&per_page=" + pageAndItemsPerPage.getSecond();
+
         // URI
-        String uri = vimeoBaseUri + videosUri;
+        String uri = vimeoBaseUri + videosUri + paginationParams;
 
         // Header for authentication
         HttpHeaders header = createHttpHeaderAuthentication();
@@ -50,17 +57,9 @@ public class VideoService {
             if (videos != null) {
                 videosArray = videos.getData();
             }
-
-            String nextUrl = getNextPageUrl(response.getHeaders());
-            while (nextUrl != null) {
-                response = restTemplate.exchange(nextUrl, HttpMethod.GET, new HttpEntity<Videos>(header), Videos.class);
-                videos = response.getBody();
-                videosArray.addAll(videos.getData());
-                nextUrl = getNextPageUrl(response.getHeaders());
-            }
             return videosArray;
         }
-        catch(RestClientResponseException err) {
+        catch(HttpClientErrorException.NotFound err) {
             throw new VideoNotFoundException();
         }
     }

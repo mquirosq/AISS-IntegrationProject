@@ -16,7 +16,7 @@ public class CommentServiceTest {
 
     @Test
     void getComments() throws CommentNotFoundException {
-        List<Comment> comments = service.getComments("/videos/371426411/comments");
+        List<Comment> comments = service.getComments("/videos/371426411/comments", 10);
         comments.forEach(c -> System.out.println(c.getText()));
     }
 }
