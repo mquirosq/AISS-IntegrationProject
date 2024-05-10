@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
 
@@ -50,6 +51,28 @@ public class CaptionController {
 
         videoRepository.save(video);
         return captionRepository.save(caption);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/captions/{captionId}")
+    public void update(@Valid @RequestBody Caption updatedCaption, @PathVariable String captionId) throws CaptionNotFoundException {
+        Optional<Caption> captionOptional = captionRepository.findById(captionId);
+
+            if (!captionOptional.isPresent()) {
+                throw new CaptionNotFoundException();
+            }
+            Caption caption = captionOptional.get();
+            caption.setLanguage(updatedCaption.getLanguage());
+            caption.setName(updatedCaption.getName());
+            captionRepository.save(caption);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/captions/{captionId}")
+    public void delete(@PathVariable String captionId){
+        if (captionRepository.existsById(captionId)){
+            captionRepository.deleteById(captionId);
+        }
     }
 
 }
