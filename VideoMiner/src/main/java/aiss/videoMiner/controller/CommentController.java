@@ -1,7 +1,9 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.CommentNotFoundException;
+import aiss.videoMiner.exception.UserNotFoundException;
 import aiss.videoMiner.exception.VideoNotFoundException;
+import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.Video;
 import aiss.videoMiner.repository.CommentRepository;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
 
@@ -24,6 +27,8 @@ public class CommentController {
 
     @Autowired
     VideoRepository videoRepository;
+    @Autowired
+    UserController userController;
 
     @GetMapping("/comments")
     public List<Comment> findAll() {
@@ -52,5 +57,29 @@ public class CommentController {
         videoRepository.save(video);
         return commentRepository.save(comment);
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/comments/{commentId}")
+    public void update(@Valid @RequestBody Comment updatedComment, @PathVariable String commentId) throws CommentNotFoundException, UserNotFoundException {
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        if (!commentOptional.isPresent()) {
+            throw new CommentNotFoundException();
+        }
+        Comment comment = commentOptional.get();
+        comment.setCreatedOn(updatedComment.getCreatedOn());
+        comment.setText(updatedComment.getText());
+        userController.update(updatedComment.getAuthor(), comment.getAuthor().getId());
+        commentRepository.save(comment);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/comments/{commentId}")
+    public void delete(@PathVariable String commentId){
+        if (commentRepository.existsById(commentId)){
+            commentRepository.deleteById(commentId);
+        }
+    }
+
 
 }
