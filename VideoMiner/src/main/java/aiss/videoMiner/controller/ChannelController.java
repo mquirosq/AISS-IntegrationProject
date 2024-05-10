@@ -55,6 +55,8 @@ public class ChannelController {
         }
         Channel channel = channelOptional.get();
         channel.setName(updatedChannel.getName());
+        channel.setDescription(updatedChannel.getDescription());
+        channel.setCreatedTime(updatedChannel.getCreatedTime());
         channelRepository.save(channel);
     }
 
