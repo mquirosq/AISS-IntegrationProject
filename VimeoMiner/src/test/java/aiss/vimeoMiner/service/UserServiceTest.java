@@ -23,31 +23,27 @@ public class UserServiceTest {
     UserService userService;
 
     @Test
-    public void testGetUser_Success() throws UserNotFoundException {
-        // Arrange
+    public void testGetUser() throws UserNotFoundException {
         String userURI = "/users/5241831";
 
-        ModelUser actualUser = userService.getUser(userURI);
+        ModelUser user = userService.getUser(userURI);
 
-        //Assert
-        assertEquals(userURI, actualUser.getUri());
+        assertEquals(userURI, user.getUri(), "Returned user Uri should match given user Uri");
     }
 
    @Test
-    public void testGetUser_NotFound() throws UserNotFoundException{
+    public void testGetUserNotFound(){
         // Arrange
         String userURI = "/users/1";
 
-        assertThrows(UserNotFoundException.class, () -> userService.getUser(userURI));
+        assertThrows(UserNotFoundException.class, () -> userService.getUser(userURI), "If the id does not correspond to a user a UserNotFoundException should be raised");
     }
     @Test
     void createUser() throws VideoMinerConnectionRefusedException, UserNotFoundException, CommentNotFoundException {
         ModelUser modelUser=userService.getUser("/users/5241831");
         VUser createdUser = userService.createUser(modelUser);
-        assertNotNull(createdUser.getName());
-        assertEquals(modelUser.getName(), createdUser.getName());
-        assertEquals(modelUser.getLink(), createdUser.getUser_link());
-        assertEquals(modelUser.getPictures().getBaseLink(), createdUser.getPicture_link());
-
+        assertEquals(modelUser.getName(), createdUser.getName(), "Name of the user given should match the name of the user returned");
+        assertEquals(modelUser.getLink(), createdUser.getUser_link(), "User link of the user given should match the user link of the user returned");
+        assertEquals(modelUser.getPictures().getBaseLink(), createdUser.getPicture_link(), "Picture link of the user given should match the picture link of the user returned");
     }
 }
