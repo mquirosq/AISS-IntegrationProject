@@ -95,6 +95,8 @@ public class CommentService {
         } catch (HttpStatusCodeException e) {
             if (e.getStatusCode().value() == 403) {
                 out = new ArrayList<>();
+            } else if (e.getStatusCode().value() == 404) {
+                throw new CommentNotFoundException();
             }
         }
 
@@ -116,7 +118,7 @@ public class CommentService {
                 }
                 next = getNextPage(uri, response);
             }
-        } catch (RestClientResponseException | CommentNotFoundException | NullPointerException e) {
+        } catch (RestClientResponseException | CommentNotFoundException e) {
             throw new CommentNotFoundException();
         }
         return out;
@@ -137,7 +139,7 @@ public class CommentService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException, VideoCommentsNotFoundException {
+    public VComment createComment(String videoId, Comment comment) throws VideoMinerConnectionRefusedException, VideoCommentsNotFoundException {
         try {
             String uri = Constants.vmBase + "/videos/" + videoId + "/comments";
             VComment vComment = transformComment(comment);
