@@ -96,7 +96,7 @@ public class VideoService {
 
     private VVideo transformVideo(VideoSnippet video) {
         VVideo out = new VVideo();
-        out.setId(video.getId().toString());
+        out.setId(video.getId().getVideoId());
         out.setName(video.getSnippet().getTitle());
         out.setDescription(video.getSnippet().getDescription());
         out.setReleaseTime(video.getSnippet().getPublishedAt());

@@ -3,7 +3,9 @@ package aiss.youTubeMiner.service;
 import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
+import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.videoModel.VVideo;
+import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,9 @@ public class VideoServiceTests {
     @Autowired
     VideoService videoService;
 
+    @Autowired
+    ChannelService channelService;
+
     final String channelId = "UCAuUUnT6oDeKwE6v1NGQxug";
 
     @Test
@@ -35,7 +40,10 @@ public class VideoServiceTests {
     }
 
     @Test
-    void createVideos() throws VideoNotFoundException {
+    void createVideos() throws VideoNotFoundException, ChannelNotFoundException, VideoMinerConnectionRefusedException {
+        Channel channel = channelService.getChannel(channelId);
+        channelService.createChannel(channel);
+
         List<VideoSnippet> videos = videoService.getVideos(channelId, 70);
         List<VVideo> videosRes = videos.stream().map(x -> {
                     try {
@@ -50,7 +58,7 @@ public class VideoServiceTests {
 
         for (int i = 0; i < videosRes.size(); i++) {
             assertNotNull(videosRes.get(i));
-            assertEquals(videosRes.get(i).getId(), videos.get(i).getId().toString());
+            assertEquals(videosRes.get(i).getId(), videos.get(i).getId().getVideoId());
             assertEquals(videosRes.get(i).getName(), videos.get(i).getSnippet().getTitle());
             assertEquals(videosRes.get(i).getDescription(), videos.get(i).getSnippet().getDescription());
             assertEquals(videosRes.get(i).getReleaseTime(), videos.get(i).getSnippet().getPublishedAt());
