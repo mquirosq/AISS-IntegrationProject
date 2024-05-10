@@ -23,7 +23,6 @@ public class CaptionController {
 
     @Autowired
     CaptionRepository captionRepository;
-
     @Autowired
     VideoRepository videoRepository;
 
