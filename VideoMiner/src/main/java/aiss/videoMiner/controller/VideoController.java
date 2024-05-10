@@ -1,7 +1,9 @@
 package aiss.videoMiner.controller;
 
+import aiss.videoMiner.exception.CaptionNotFoundException;
 import aiss.videoMiner.exception.ChannelNotFoundException;
 import aiss.videoMiner.exception.VideoNotFoundException;
+import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.model.Video;
 import aiss.videoMiner.repository.ChannelRepository;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
 
@@ -51,4 +54,28 @@ public class VideoController {
         channelRepository.save(channel);
         return videoRepository.save(video);
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/videos/{videoId}")
+    public void update(@Valid @RequestBody Video updatedVideo, @PathVariable String videoId) throws VideoNotFoundException {
+        Optional<Video> videoOptional = videoRepository.findById(videoId);
+
+        if (!videoOptional.isPresent()) {
+            throw new VideoNotFoundException();
+        }
+        Video video = videoOptional.get();
+        video.setName(updatedVideo.getName());
+        video.setDescription(updatedVideo.getDescription());
+        video.setReleaseTime(updatedVideo.getReleaseTime());
+        videoRepository.save(video);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/videos/{videoId}")
+    public void delete(@PathVariable String videoId){
+        if (videoRepository.existsById(videoId)){
+            videoRepository.deleteById(videoId);
+        }
+    }
+
 }
