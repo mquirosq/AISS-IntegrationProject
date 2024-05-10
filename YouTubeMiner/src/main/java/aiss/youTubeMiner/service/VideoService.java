@@ -60,7 +60,7 @@ public class VideoService {
                 next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
             }
             return out;
-        } catch (RestClientResponseException e) {
+        } catch (HttpClientErrorException.NotFound e) {
             throw new VideoNotFoundException();
         }
     }

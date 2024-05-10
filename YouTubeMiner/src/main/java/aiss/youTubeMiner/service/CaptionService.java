@@ -42,7 +42,7 @@ public class CaptionService {
                     CaptionSearch.class
             );
             return response.getBody().getItems();
-        } catch (NullPointerException|RestClientResponseException e) {
+        } catch (NullPointerException|HttpClientErrorException.NotFound e) {
             throw new CaptionNotFoundException();
         }
     }
