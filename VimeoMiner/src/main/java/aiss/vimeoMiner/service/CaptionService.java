@@ -84,7 +84,6 @@ public class CaptionService {
         }
         // Catch connection exceptions
         catch(ResourceAccessException err){
-
             throw new VideoMinerConnectionRefusedException();
         }
     }

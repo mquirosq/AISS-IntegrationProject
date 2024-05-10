@@ -36,7 +36,7 @@ public class ChannelService {
             channel.setId(channelId);
             return channel;
         }
-        catch (RestClientResponseException err) {
+        catch (HttpClientErrorException.NotFound err) {
             throw new ChannelNotFoundException();
         }
     }
