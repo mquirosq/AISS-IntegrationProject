@@ -76,15 +76,4 @@ public class UserController {
         user.setPicture_link(updatedUser.getPicture_link());
         userRepository.save(user);
     }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/users/{userId}")
-    public void delete(@PathVariable Long userId){
-        if (userRepository.existsById(userId)){
-            userRepository.deleteById(userId);
-        }
-    }
-
-
-
 }
