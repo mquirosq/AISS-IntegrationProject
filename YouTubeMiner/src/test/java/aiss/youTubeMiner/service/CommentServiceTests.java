@@ -22,7 +22,8 @@ public class CommentServiceTests {
     CommentService commentService;
 
     final String commentId = "Ugw1rC5jPweHXk7h7KR4AaABAg";
-    final String videoId = "jmycUQs6tVA";
+
+    final String videoId = "P9-fJI0iZv4";
 
     @Test
     void getCommentPositive() throws CommentNotFoundException {
@@ -38,7 +39,7 @@ public class CommentServiceTests {
         List<Comment> comments = commentService.getCommentsFromVideo(videoId);
         List<VComment> commentsRes = comments.stream().map(x -> {
                     try {
-                        return commentService.createComment(x, videoId);
+                        return commentService.createComment(videoId, x);
                     } catch (VideoMinerConnectionRefusedException | VideoCommentsNotFoundException e) {
                         throw new RuntimeException(e);
                     }
