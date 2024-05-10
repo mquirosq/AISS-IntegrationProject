@@ -51,30 +51,35 @@ public class ChannelController {
     public VChannel populateOne(@PathVariable String channelId,
                                 @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
                                 @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
-            throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException {
+            throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException, TooManyRequestsException {
 
-        Channel channel = channelService.getChannel(channelId);
-        VChannel vChannel = channelService.transformChannel(channel);
+        try{
+            Channel channel = channelService.getChannel(channelId);
+            VChannel vChannel = channelService.transformChannel(channel);
 
-        List<Video> videos = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri(), maxVideos);
-        for (Video v : videos) {
-            VVideo vVideo = videoService.transformVideo(v);
+            List<Video> videos = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri(), maxVideos);
+            for (Video v : videos) {
+                VVideo vVideo = videoService.transformVideo(v);
 
-            List<Caption> captions = captionService.getCaptions(v.getMetadata().getConnections().getTexttracks().getUri());
-            for (Caption caption : captions) {
-                VCaption vCaption = captionService.transformCaption(caption);
-                vVideo.getCaptions().add(vCaption);
+                List<Caption> captions = captionService.getCaptions(v.getMetadata().getConnections().getTexttracks().getUri());
+                for (Caption caption : captions) {
+                    VCaption vCaption = captionService.transformCaption(caption);
+                    vVideo.getCaptions().add(vCaption);
+                }
+
+                List<Comment> comments = commentService.getComments(v.getMetadata().getConnections().getComments().getUri(), maxComments);
+                for (Comment comment : comments) {
+                    VComment vComment = commentService.transformComment(comment);
+
+                    vVideo.getComments().add(vComment);
+                }
+                vChannel.getVideos().add(vVideo);
             }
-
-            List<Comment> comments = commentService.getComments(v.getMetadata().getConnections().getComments().getUri(), maxComments);
-            for (Comment comment : comments) {
-                VComment vComment = commentService.transformComment(comment);
-
-                vVideo.getComments().add(vComment);
-            }
-            vChannel.getVideos().add(vVideo);
+            VChannel createdChannel = channelService.createChannel(vChannel);
+            return createdChannel;
         }
-        VChannel createdChannel = channelService.createChannel(vChannel);
-        return createdChannel;
+        catch(HttpClientErrorException.TooManyRequests err){
+            throw new TooManyRequestsException();
+        }
     }
 }
