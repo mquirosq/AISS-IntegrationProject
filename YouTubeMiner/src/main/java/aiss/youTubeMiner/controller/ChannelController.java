@@ -76,7 +76,7 @@ public class ChannelController {
                 captionService.getCaptions(x.getId()).forEach(c -> {
                     try {
                         x.getCaptions().add(captionService.createCaption(x.getId(),c));
-                    } catch (VideoMinerConnectionRefusedException e) {
+                    } catch (VideoNotFoundException|VideoMinerConnectionRefusedException e) {
                         throw new RuntimeException(e);
                     }
                 });

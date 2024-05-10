@@ -35,12 +35,12 @@ public class CaptionServiceTests {
     }
 
     @Test
-    void createCaptions() throws CaptionNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException {
+    void createCaptions() throws CaptionNotFoundException {
         List<Caption> captions = captionService.getCaptions(videoId);
         List<VCaption> captionsRes = captions.stream().map(x-> {
             try {
                 return captionService.createCaption(videoId, x);
-            } catch (VideoMinerConnectionRefusedException e) {
+            } catch (VideoNotFoundException|VideoMinerConnectionRefusedException e) {
                 throw new RuntimeException(e);
             }
         })
