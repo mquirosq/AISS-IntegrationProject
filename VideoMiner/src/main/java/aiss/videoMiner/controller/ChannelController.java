@@ -1,6 +1,7 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.ChannelNotFoundException;
+import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.repository.ChannelRepository;
 import jakarta.validation.Valid;
@@ -43,4 +44,26 @@ public class ChannelController {
                 .save(channel);
         return _channel;
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{channelId}")
+    public void update(@Valid @RequestBody Channel updatedChannel, @PathVariable String channelId) throws ChannelNotFoundException {
+        Optional<Channel> channelOptional = channelRepository.findById(channelId);
+
+        if (!channelOptional.isPresent()) {
+            throw new ChannelNotFoundException();
+        }
+        Channel channel = channelOptional.get();
+        channel.setName(updatedChannel.getName());
+        channelRepository.save(channel);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{channelId}")
+    public void delete(@PathVariable String channelId){
+        if (channelRepository.existsById(channelId)){
+            channelRepository.deleteById(channelId);
+        }
+    }
+
 }
