@@ -1,5 +1,6 @@
 package aiss.videoMiner.controller;
 
+import aiss.videoMiner.exception.CaptionNotFoundException;
 import aiss.videoMiner.exception.CommentNotFoundException;
 import aiss.videoMiner.exception.UserNotFoundException;
 import aiss.videoMiner.model.Comment;
@@ -59,6 +60,29 @@ public class UserController {
 
         commentRepository.save(comment);
         return userRepository.save(user);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/users/{userId}")
+    public void update(@Valid @RequestBody User updatedUser, @PathVariable Long userId) throws UserNotFoundException {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException();
+        }
+        User user = userOptional.get();
+        user.setName(updatedUser.getName());
+        user.setUser_link(updatedUser.getUser_link());
+        user.setPicture_link(updatedUser.getPicture_link());
+        userRepository.save(user);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/users/{userId}")
+    public void delete(@PathVariable Long userId){
+        if (userRepository.existsById(userId)){
+            userRepository.deleteById(userId);
+        }
     }
 
 
