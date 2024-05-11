@@ -27,7 +27,7 @@ public class CaptionServiceTest {
     @Test
     void getCaptions() throws CaptionNotFoundException {
         String videoId = "301594884";
-        List<Caption> captions = service.getCaptions("/videos/301594884/texttracks");
+        List<Caption> captions = service.getCaptions("/videos/" + videoId + "/texttracks");
         captions.forEach(c -> assertEquals(videoId, c.getUri().split("/")[2], "Returned caption Uri should match given video ID"));
     }
 
