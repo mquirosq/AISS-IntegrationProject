@@ -42,11 +42,20 @@ public class ChannelController {
     @Autowired
     UserService userService;
 
-
+    @Operation(
+            summary="Retrieve a channel",
+            description = "Get a VChannel object with data retrieved from the channel with the given id in Vimeo",
+            tags= {"channels", "get"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema=
+                @Schema(implementation=VChannel.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
+            @ApiResponse(responseCode = "429", content = {@Content(schema=@Schema())})
+    })
     @GetMapping("{channelId}")
-    public VChannel findOne(@PathVariable String channelId,
-                            @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
-                            @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
+    public VChannel findOne(@Parameter(description = "id of the channel to be searched") @PathVariable String channelId,
+                            @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
+                            @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
             throws ChannelNotFoundException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException, TooManyRequestsException {
 
         try{
@@ -57,12 +66,22 @@ public class ChannelController {
         }
     }
 
-
+    @Operation(
+            summary="Create a channel",
+            description = "Create a VChannel object in the VideoMiner database with data retrieved from the channel with the given id in Vimeo",
+            tags= {"channels", "post"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema=
+                @Schema(implementation=VChannel.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
+            @ApiResponse(responseCode="408", content = {@Content(schema=@Schema())}),
+            @ApiResponse(responseCode = "429", content = {@Content(schema=@Schema())})
+    })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("{channelId}")
-    public VChannel populateOne(@PathVariable String channelId,
-                                @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
-                                @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
+    public VChannel populateOne(@Parameter(description = "id of the channel to be searched") @PathVariable String channelId,
+                                @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
+                                @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
             throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException, TooManyRequestsException {
 
         try{
