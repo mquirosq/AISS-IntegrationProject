@@ -1,6 +1,7 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.ChannelNotFoundException;
+import aiss.videoMiner.exception.OrderByPropertyDoesNotExistChannelException;
 import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.repository.ChannelRepository;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +17,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,34 +44,37 @@ public class ChannelController {
     public List<Channel> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
                                  @Parameter(description = "maximum number of videos per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                                  @Parameter(description = "string that must be included in the name of the channel") @RequestParam(name="name", required = false) String name,
-                                 @Parameter(description = "takes as value one of the properties of the channel and orders the channels by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy){
-     // Handle erroneous order name?
-     // Handle pages that are too big?
+                                 @Parameter(description = "takes as value one of the properties of the channel and orders the channels by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
+            throws OrderByPropertyDoesNotExistChannelException {
 
         Pageable paging;
 
         if (orderBy != null){
-            if (orderBy.startsWith("-")){
-                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+                if (orderBy.startsWith("-")){
+                    paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+                }
+                else {
+                    paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
+                }
             }
-            else {
-                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
-            }
-        }
         else
             paging = PageRequest.of(offset, limit);
 
         Page<Channel> pageChannels;
 
-        if (name != null)
-            pageChannels = channelRepository.findByNameContaining(name, paging);
-        else
-            pageChannels = channelRepository.findAll(paging);
+        try{
+            if (name != null)
+                pageChannels = channelRepository.findByNameContaining(name, paging);
+            else
+                pageChannels = channelRepository.findAll(paging);
+        }
+        catch(PropertyReferenceException err){
+            throw new OrderByPropertyDoesNotExistChannelException();
+        }
         return pageChannels.getContent();
 
     }
 
-    // Offset = page, limit = size, totalCount?
 
     @Operation(
             summary="Retrieve a Channel by Id",
