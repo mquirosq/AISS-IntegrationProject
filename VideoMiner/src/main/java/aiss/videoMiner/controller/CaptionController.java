@@ -120,9 +120,7 @@ public class CaptionController {
             summary="Delete a Caption",
             description = "Delete the Caption identified by the given id",
             tags= {"captions", "delete", "id"})
-    @ApiResponses({
-            @ApiResponse(responseCode="204", content = {@Content(schema=@Schema())})
-    })
+    @ApiResponse(responseCode="204", content = {@Content(schema=@Schema())})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/captions/{captionId}")
     public void delete(@Parameter(description = "id of the caption to be deleted") @PathVariable String captionId){
