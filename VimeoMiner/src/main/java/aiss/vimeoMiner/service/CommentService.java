@@ -57,26 +57,6 @@ public class CommentService {
         }
     }
 
-    //Post to VideoMiner
-    public VComment createComment(Comment comment, String videoId) throws VideoMinerConnectionRefusedException, VideoNotFoundException {
-        String uri = videoMinerBaseUri + "/videos/" + videoId + "/comments";
-        try {
-            // Convert properties:
-            VComment vComment = transformComment(comment);
-            // Http request
-            HttpEntity<VComment> request = new HttpEntity<>(vComment);
-            ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
-            return response.getBody();
-        }
-        catch(HttpClientErrorException.NotFound e) {
-            throw new VideoNotFoundException();
-        }
-        // Catch connection exceptions
-        catch(ResourceAccessException err){
-            throw new VideoMinerConnectionRefusedException();
-        }
-    }
-
     public VComment transformComment(Comment comment){
         VComment vComment = new VComment();
         VUser vUser = new VUser();

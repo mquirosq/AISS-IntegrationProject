@@ -42,23 +42,4 @@ class VideoServiceTest {
         assertThrows(VideoNotFoundException.class, () -> videoService.getVideos(uri, 2), "If the id does not correspond to a video a VideoNotFoundException should be raised");
     }
 
-    // Create test:
-    @Test
-    void create() throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException {
-        String channelId = "1901688";
-        Channel channel = channelService.getChannel(channelId);
-        List<Video> videoList = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri(), 2);
-        for (Video v : videoList){
-            if (v != null) {
-                VVideo vVideo = videoService.createVideo(v, channelId);
-                assertNotNull(vVideo.getId(), "Videos should have an id");
-                assertEquals(vVideo.getDescription(), v.getDescription(), "Description of the video given should match the description of the video returned");
-                assertEquals(vVideo.getName(), v.getName(), "Name of the video given should match the name of the video returned");
-                assertEquals(vVideo.getReleaseTime(), v.getReleaseTime(), "Release time of the video given should match the release time of the video returned");
-            }
-        }
-
-    }
-
-
 }
