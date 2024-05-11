@@ -94,6 +94,6 @@ public class ChannelController {
             }
             vChannel.getVideos().add(vVideo);
         }
-        return vChannel;
+        return channelService.createChannel(vChannel);
     }
 }

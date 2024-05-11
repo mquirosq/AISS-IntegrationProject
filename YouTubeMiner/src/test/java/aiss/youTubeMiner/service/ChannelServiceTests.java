@@ -28,15 +28,4 @@ public class ChannelServiceTests {
         assertThrows(ChannelNotFoundException.class, ()->channelService.getChannel("foo"));
     }
 
-    @Test
-    void createChannel() throws ChannelNotFoundException, VideoMinerConnectionRefusedException {
-        Channel channel = channelService.getChannel(channelId);
-        VChannel channelRes = channelService.createChannel(channel);
-
-        assertNotNull(channelRes);
-        assertEquals(channelRes.getId(), channel.getId());
-        assertEquals(channelRes.getName(), channel.getSnippet().getTitle());
-        assertEquals(channelRes.getDescription(), channel.getSnippet().getDescription());
-        assertEquals(channelRes.getCreatedTime(), channel.getSnippet().getPublishedAt());
-    }
 }

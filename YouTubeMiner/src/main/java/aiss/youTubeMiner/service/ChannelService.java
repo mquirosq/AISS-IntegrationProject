@@ -43,10 +43,9 @@ public class ChannelService {
         }
     }
 
-    public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
+    public VChannel createChannel(VChannel vChannel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         try {
             String uri = Constants.vmBase + "/channels";
-            VChannel vChannel = transformChannel(channel);
             HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
             ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);
             return response.getBody();
