@@ -2,13 +2,11 @@ package aiss.vimeoMiner.controller;
 
 import aiss.vimeoMiner.exception.*;
 import aiss.vimeoMiner.service.*;
-import aiss.vimeoMiner.videoModel.VCaption;
 import aiss.vimeoMiner.videoModel.VChannel;
 import aiss.vimeoMiner.videoModel.VComment;
 import aiss.vimeoMiner.videoModel.VVideo;
 import aiss.vimeoMiner.vimeoModel.modelCaption.Caption;
 import aiss.vimeoMiner.vimeoModel.modelChannel.Channel;
-import aiss.vimeoMiner.vimeoModel.modelComment.Comment;
 import aiss.vimeoMiner.vimeoModel.modelVideos.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,16 +29,13 @@ import static aiss.vimeoMiner.helper.ConstantsHelper.apiBaseUri;
 @RestController
 @RequestMapping(apiBaseUri + "/channels")
 public class ChannelController {
+
     @Autowired
     ChannelService channelService;
     @Autowired
     VideoService videoService;
     @Autowired
-    CaptionService captionService;
-    @Autowired
-    CommentService commentService;
-    @Autowired
-    UserService userService;
+    VideoController videoController;
 
     @Operation(
             summary="Retrieve a channel",
@@ -99,20 +94,7 @@ public class ChannelController {
 
         List<Video> videos = videoService.getVideos(channel.getMetadata().getConnections().getVideos().getUri(), maxVideos);
         for (Video v : videos) {
-            VVideo vVideo = videoService.transformVideo(v);
-
-            List<Caption> captions = captionService.getCaptions(v.getMetadata().getConnections().getTexttracks().getUri());
-            for (Caption caption : captions) {
-                VCaption vCaption = captionService.transformCaption(caption);
-                vVideo.getCaptions().add(vCaption);
-            }
-
-            List<Comment> comments = commentService.getComments(v.getMetadata().getConnections().getComments().getUri(), maxComments);
-            for (Comment comment : comments) {
-                VComment vComment = commentService.transformComment(comment);
-
-                vVideo.getComments().add(vComment);
-            }
+            VVideo vVideo = videoController.populateVVideo(v, maxComments);
             vChannel.getVideos().add(vVideo);
         }
         return vChannel;

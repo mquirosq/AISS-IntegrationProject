@@ -35,7 +35,8 @@ class ChannelServiceTest {
     @Test
     void createChannel() throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         Channel channel = service.getChannel("1901688");
-        VChannel createdChannel = service.createChannel(service.transformChannel(channel));
+        VChannel vChannel = service.transformChannel(channel);
+        VChannel createdChannel = service.createChannel(vChannel);
         assertNotNull(createdChannel.getId(), "Channel must have an id");
         assertEquals(channel.getId(), createdChannel.getId(), "Returned channel id should match given id");
         assertEquals(channel.getName(), createdChannel.getName(), "Returned channel name should match given name");
