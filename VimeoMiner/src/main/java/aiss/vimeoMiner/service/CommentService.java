@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import java.util.List;
 
 import static aiss.vimeoMiner.helper.AuthenticationHelper.createHttpHeaderAuthentication;
 import static aiss.vimeoMiner.helper.ConstantsHelper.*;
-import static aiss.vimeoMiner.helper.PaginationHelper.getNextPageUrl;
 import static aiss.vimeoMiner.helper.PaginationHelper.getPageAndItemsPerPage;
 
 @Service
@@ -83,8 +81,8 @@ public class CommentService {
         VComment vComment = new VComment();
         VUser vUser = new VUser();
         vUser.setName(comment.getUser().getName());
-        vUser.setPicture_link(comment.getUser().getPictures().getBaseLink());
-        vUser.setUser_link(comment.getLink());
+        vUser.setPictureLink(comment.getUser().getPictures().getBaseLink());
+        vUser.setUserLink(comment.getLink());
         vComment.setId(comment.getUri().split("/")[4]);
         vComment.setAuthor(vUser);
         vComment.setCreatedOn(comment.getCreatedOn());

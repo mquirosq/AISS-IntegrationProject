@@ -1,13 +1,10 @@
 package aiss.vimeoMiner.service;
 
-import aiss.vimeoMiner.exception.CaptionNotFoundException;
 import aiss.vimeoMiner.exception.CommentNotFoundException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.vimeoMiner.exception.VideoNotFoundException;
-import aiss.vimeoMiner.videoModel.VCaption;
 import aiss.vimeoMiner.videoModel.VComment;
 import aiss.vimeoMiner.videoModel.VUser;
-import aiss.vimeoMiner.vimeoModel.modelCaption.Caption;
 import aiss.vimeoMiner.vimeoModel.modelComment.Comment;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +43,8 @@ public class CommentServiceTest {
         VComment createdComment = service.createComment(comment,"371426411");
         VUser vUser = new VUser();
         vUser.setName(comment.getUser().getName());
-        vUser.setPicture_link(comment.getUser().getPictures().getBaseLink());
-        vUser.setUser_link(comment.getLink());
+        vUser.setPictureLink(comment.getUser().getPictures().getBaseLink());
+        vUser.setUserLink(comment.getLink());
 
         assertNotNull(createdComment.getId(), "Created comment must have an id");
         assertEquals(comment.getUri().split("/")[4], createdComment.getId(), "Returned comment id should match given id");
