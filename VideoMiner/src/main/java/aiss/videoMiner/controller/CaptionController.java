@@ -45,7 +45,7 @@ public class CaptionController {
     @Operation(
             summary="Retrieve a Caption by Id",
             description = "Get a Caption object by specifying its id",
-            tags= {"captions", "get", "id"})
+            tags= {"captions", "get"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
                 @Schema(implementation=Caption.class), mediaType="application/json")}),
@@ -59,7 +59,7 @@ public class CaptionController {
     @Operation(
             summary="Retrieve all captions from a video",
             description = "Get a list of Caption objects belonging to the video with the given id",
-            tags= {"captions", "get", "id", "videos"})
+            tags= {"captions", "get", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Caption.class), mediaType="application/json")}),
@@ -73,7 +73,7 @@ public class CaptionController {
     @Operation(
             summary="Insert a Caption in a video",
             description = "Add a new Caption whose data is passed in the body of the request in JSON format to the specified video by id",
-            tags= {"captions", "post", "id", "videos"})
+            tags= {"captions", "post", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {@Content(schema=
             @Schema(implementation=Caption.class), mediaType="application/json")}),
@@ -96,7 +96,7 @@ public class CaptionController {
     @Operation(
             summary="Update a Caption",
             description = "Update a Caption object by specifying its id and whose data is passed in the body of the request in JSON format",
-            tags= {"captions", "put", "id"})
+            tags= {"captions", "put"})
     @ApiResponses({
             @ApiResponse(responseCode = "204", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
@@ -119,7 +119,7 @@ public class CaptionController {
     @Operation(
             summary="Delete a Caption",
             description = "Delete the Caption identified by the given id",
-            tags= {"captions", "delete", "id"})
+            tags= {"captions", "delete"})
     @ApiResponse(responseCode="204", content = {@Content(schema=@Schema())})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/captions/{captionId}")

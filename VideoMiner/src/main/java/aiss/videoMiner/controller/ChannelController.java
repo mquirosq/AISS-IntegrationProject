@@ -42,7 +42,7 @@ public class ChannelController {
     @Operation(
             summary="Retrieve a Channel by Id",
             description = "Get a Channel object by specifying its id",
-            tags= {"channels", "get", "id"})
+            tags= {"channels", "get"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Channel.class), mediaType="application/json")}),
@@ -77,7 +77,7 @@ public class ChannelController {
     @Operation(
             summary="Update a Channel",
             description = "Update a Channel object by specifying its id and whose data is passed in the body of the request in JSON format",
-            tags= {"channels", "put", "id"})
+            tags= {"channels", "put"})
     @ApiResponses({
             @ApiResponse(responseCode = "204", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
@@ -101,7 +101,7 @@ public class ChannelController {
     @Operation(
             summary="Delete a Channel",
             description = "Delete the Channel identified by the given id",
-            tags= {"channels", "delete", "id"})
+            tags= {"channels", "delete"})
     @ApiResponse(responseCode="204", content = {@Content(schema=@Schema())})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{channelId}")

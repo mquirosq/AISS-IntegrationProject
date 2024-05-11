@@ -50,7 +50,7 @@ public class UserController {
     @Operation(
             summary="Retrieve a User by Id",
             description = "Get a User object by specifying its id",
-            tags= {"users", "get", "id"})
+            tags= {"users", "get"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=User.class), mediaType="application/json")}),
@@ -68,7 +68,7 @@ public class UserController {
     @Operation(
             summary="Retrieve the author from a comment",
             description = "Get a User object representing the author of the comment with the given id",
-            tags= {"users", "get", "id", "comments"})
+            tags= {"users", "get", "comments"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=User.class), mediaType="application/json")}),
@@ -83,7 +83,7 @@ public class UserController {
     @Operation(
             summary="Insert a User in a comment",
             description = "Add a new User whose data is passed in the body of the request in JSON format to the specified comment by id",
-            tags= {"users", "post", "id", "comments"})
+            tags= {"users", "post", "comments"})
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {@Content(schema=
             @Schema(implementation=User.class), mediaType="application/json")}),
@@ -104,7 +104,7 @@ public class UserController {
     @Operation(
             summary="Update a User",
             description = "Update a User object by specifying its id and whose data is passed in the body of the request in JSON format",
-            tags= {"users", "put", "id"})
+            tags= {"users", "put"})
     @ApiResponses({
             @ApiResponse(responseCode = "204", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),

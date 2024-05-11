@@ -5,8 +5,10 @@ import aiss.videoMiner.exception.UserNotFoundException;
 import aiss.videoMiner.exception.VideoNotFoundException;
 import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
+import aiss.videoMiner.model.User;
 import aiss.videoMiner.model.Video;
 import aiss.videoMiner.repository.CommentRepository;
+import aiss.videoMiner.repository.UserRepository;
 import aiss.videoMiner.repository.VideoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,6 +38,8 @@ public class CommentController {
     VideoRepository videoRepository;
     @Autowired
     UserController userController;
+    @Autowired
+    UserRepository userRepository;
 
     @Operation(
             summary="Retrieve all Comments",
@@ -51,7 +55,7 @@ public class CommentController {
     @Operation(
             summary="Retrieve a Comment by Id",
             description = "Get a Comment object by specifying its id",
-            tags= {"comments", "get", "id"})
+            tags= {"comments", "get"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Comment.class), mediaType="application/json")}),
@@ -65,7 +69,7 @@ public class CommentController {
     @Operation(
             summary="Retrieve all comments from a video",
             description = "Get a list of Comment objects belonging to the video with the given id",
-            tags= {"comments", "get", "id", "videos"})
+            tags= {"comments", "get", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Comment.class), mediaType="application/json")}),
@@ -79,7 +83,7 @@ public class CommentController {
     @Operation(
             summary="Insert a Comment in a video",
             description = "Add a new Comment whose data is passed in the body of the request in JSON format to the specified video by id",
-            tags= {"comments", "post", "id", "videos"})
+            tags= {"comments", "post", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {@Content(schema=
             @Schema(implementation=Comment.class), mediaType="application/json")}),
@@ -102,7 +106,7 @@ public class CommentController {
     @Operation(
             summary="Update a Comment",
             description = "Update a Comment object by specifying its id and whose data is passed in the body of the request in JSON format",
-            tags= {"comments", "put", "id"})
+            tags= {"comments", "put"})
     @ApiResponses({
             @ApiResponse(responseCode = "204", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
@@ -126,13 +130,15 @@ public class CommentController {
     @Operation(
             summary="Delete a Comment",
             description = "Delete the Comment identified by the given id",
-            tags= {"comments", "delete", "id"})
+            tags= {"comments", "delete"})
     @ApiResponse(responseCode="204", content = {@Content(schema=@Schema())})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/comments/{commentId}")
     public void delete(@Parameter(description = "id of the comment to be deleted")@PathVariable String commentId){
         if (commentRepository.existsById(commentId)){
+            User user = commentRepository.findById(commentId).get().getAuthor();
             commentRepository.deleteById(commentId);
+            userRepository.deleteById(user.getId());
         }
     }
 

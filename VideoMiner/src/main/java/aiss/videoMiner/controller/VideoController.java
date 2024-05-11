@@ -48,7 +48,7 @@ public class VideoController {
     @Operation(
             summary="Retrieve a Video by Id",
             description = "Get Video object by specifying its id",
-            tags= {"videos", "get", "id"})
+            tags= {"videos", "get"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
                 @Schema(implementation=Video.class), mediaType="application/json")}),
@@ -62,7 +62,7 @@ public class VideoController {
     @Operation(
             summary="Retrieve all videos from a channel",
             description = "Get a list of Video objects belonging to the channel with the given id",
-            tags= {"videos", "get", "id", "channels"})
+            tags= {"videos", "get", "channels"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Video.class), mediaType="application/json")}),
@@ -76,7 +76,7 @@ public class VideoController {
     @Operation(
             summary="Insert a Video in a channel",
             description = "Add a new Video whose data is passed in the body of the request in JSON format to the specified channel by id",
-            tags= {"videos", "post", "id", "channels"})
+            tags= {"videos", "post", "channels"})
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {@Content(schema=
             @Schema(implementation=Video.class), mediaType="application/json")}),
@@ -99,7 +99,7 @@ public class VideoController {
     @Operation(
             summary="Update a Video",
             description = "Update a Video object by specifying its id and whose data is passed in the body of the request in JSON format",
-            tags= {"videos", "put", "id"})
+            tags= {"videos", "put"})
     @ApiResponses({
             @ApiResponse(responseCode = "204", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
@@ -123,7 +123,7 @@ public class VideoController {
     @Operation(
             summary="Delete a Video",
             description = "Delete the Video identified by the given id",
-            tags= {"videos", "delete", "id"})
+            tags= {"videos", "delete"})
     @ApiResponse(responseCode="204", content = {@Content(schema=@Schema())})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/videos/{videoId}")
