@@ -1,9 +1,12 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.ChannelNotFoundException;
-import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.repository.ChannelRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,9 +38,37 @@ public class ChannelController {
     @ApiResponse(responseCode = "200", content = {@Content(schema=
     @Schema(implementation=Channel.class), mediaType="application/json")})
     @GetMapping
-    public List<Channel> findAll(){
-        return channelRepository.findAll();
+    public List<Channel> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                                 @Parameter(description = "maximum number of videos per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                 @Parameter(description = "string that must be included in the name of the channel") @RequestParam(name="name", required = false) String name,
+                                 @Parameter(description = "takes as value one of the properties of the channel and orders the channels by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy){
+     // Handle erroneous order name?
+     // Handle pages that are too big?
+
+        Pageable paging;
+
+        if (orderBy != null){
+            if (orderBy.startsWith("-")){
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+            }
+            else {
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
+            }
+        }
+        else
+            paging = PageRequest.of(offset, limit);
+
+        Page<Channel> pageChannels;
+
+        if (name != null)
+            pageChannels = channelRepository.findByNameContaining(name, paging);
+        else
+            pageChannels = channelRepository.findAll(paging);
+        return pageChannels.getContent();
+
     }
+
+    // Offset = page, limit = size, totalCount?
 
     @Operation(
             summary="Retrieve a Channel by Id",
