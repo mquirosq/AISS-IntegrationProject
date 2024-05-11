@@ -20,7 +20,7 @@ import java.util.List;
 
 import static aiss.vimeoMiner.helper.ConstantsHelper.apiBaseUri;
 
-@Tag(name="Comment", description="Comment manager API for Vimeo captions")
+@Tag(name="Comment", description="Comment manager API for Vimeo comments")
 @RestController
 @RequestMapping(apiBaseUri)
 public class CommentController {
