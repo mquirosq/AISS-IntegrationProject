@@ -53,7 +53,7 @@ public class ChannelController {
     })
     @GetMapping("{channelId}")
     public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException {
-        return channelService.transformChannel(channelService.getChannel(channelId));
+        return channelService.getChannel(channelId);
     }
 
     @Operation(
@@ -74,22 +74,22 @@ public class ChannelController {
             throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException {
 
         Channel channel = channelService.getChannel(channelId);
-        VChannel vChannel = channelService.createChannel(channel);
+        VChannel vChannel = channelService.transformChannel(channel);
 
         List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos);
         for (VideoSnippet v : videos) {
-            VVideo vVideo = videoService.createVideo(channelId, v);
+            VVideo vVideo = videoService.transformVideo(v);
             String videoId = v.getId().getVideoId();
 
             List<Caption> captions = captionService.getCaptions(videoId);
             for (Caption caption : captions) {
-                VCaption vCaption = captionService.createCaption(videoId, caption);
+                VCaption vCaption = captionService.transformCaption(caption);
                 vVideo.getCaptions().add(vCaption);
             }
 
             List<Comment> comments = commentService.getCommentsFromVideo(videoId, maxComments);
             for (Comment comment : comments) {
-                VComment vComment = commentService.createComment(videoId, comment);
+                VComment vComment = commentService.transformComment(comment);
                 vVideo.getComments().add(vComment);
             }
             vChannel.getVideos().add(vVideo);
