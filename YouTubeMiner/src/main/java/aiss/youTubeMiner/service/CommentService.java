@@ -140,36 +140,6 @@ public class CommentService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VComment createComment(String videoId, Comment comment) throws VideoMinerConnectionRefusedException, VideoCommentsNotFoundException {
-        try {
-            String uri = Constants.vmBase + "/videos/" + videoId + "/comments";
-            VComment vComment = transformComment(comment);
-            HttpEntity<VComment> request = new HttpEntity<>(vComment);
-            ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
-            return response.getBody();
-        } catch(HttpClientErrorException.NotFound e) {
-            throw new VideoCommentsNotFoundException();
-        } catch (ResourceAccessException e) {
-            throw new VideoMinerConnectionRefusedException();
-        }
-    }
-    
-    public VUser createUser(String commentId) throws VideoMinerConnectionRefusedException, CommentNotFoundException {
-        try {
-            String uri = Constants.vmBase + "/comments/" + commentId + "/user";
-            VUser vUser = getUser(commentId);
-            HttpEntity<VUser> request = new HttpEntity<>(vUser);
-            ResponseEntity<VUser> response = restTemplate.exchange(uri, HttpMethod.POST, request, VUser.class);
-            return response.getBody();
-        } catch (ResourceAccessException e) {
-            throw new VideoMinerConnectionRefusedException();
-        } catch(HttpClientErrorException.NotFound e) {
-            throw new CommentNotFoundException();
-        } catch (CommentNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public VComment transformComment(Comment comment) {
         VComment out = new VComment();
         VUser aux = transformUser(comment);

@@ -35,29 +35,6 @@ public class CommentServiceTests {
     void getCommentNegative() {assertThrows(CommentNotFoundException.class, ()->commentService.getComment("fighters"));}
 
     @Test
-    void createComment() throws VideoCommentsNotFoundException, CommentNotFoundException {
-        List<Comment> comments = commentService.getCommentsFromVideo(videoId, 10);
-        List<VComment> commentsRes = comments.stream().map(x -> {
-                    try {
-                        return commentService.createComment(videoId, x);
-                    } catch (VideoMinerConnectionRefusedException | VideoCommentsNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
-
-        assertFalse(commentsRes.isEmpty());
-
-        for (int i = 0; i < commentsRes.size(); i++) {
-            assertNotNull(commentsRes.get(i));
-            assertEquals(commentsRes.get(i).getId(), comments.get(i).getCommentSnippet().getTopLevelComment().getId());
-            assertEquals(commentsRes.get(i).getAuthor().getName(), comments.get(i).getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
-            assertEquals(commentsRes.get(i).getCreatedOn(), comments.get(i).getCommentSnippet().getTopLevelComment().getSnippet().getPublishedAt());
-            assertEquals(commentsRes.get(i).getText(), comments.get(i).getCommentSnippet().getTopLevelComment().getSnippet().getTextOriginal());
-        }
-    }
-
-    @Test
     void getCommentsFromVideoPositive() throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> comments = commentService.getCommentsFromVideo(videoId, 10);
         assertFalse(comments.isEmpty());
@@ -75,16 +52,4 @@ public class CommentServiceTests {
 
     @Test
     void getUserNegative() { assertThrows(CommentNotFoundException.class, ()-> commentService.getUser("comment"));}
-
-    @Test
-    void createUser() throws CommentNotFoundException {
-        VUser user = null;
-        try {
-            user = commentService.getUser(commentId);
-        } catch (CommentNotFoundException e) {
-            throw new RuntimeException();
-        }
-
-        assertNotNull(user);
-    }
 }
