@@ -1,9 +1,7 @@
 package aiss.videoMiner.controller;
 
-import aiss.videoMiner.exception.CaptionNotFoundException;
 import aiss.videoMiner.exception.CommentNotFoundException;
 import aiss.videoMiner.exception.UserNotFoundException;
-import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.User;
 import aiss.videoMiner.repository.CommentRepository;
@@ -122,8 +120,8 @@ public class UserController {
         }
         User user = userOptional.get();
         user.setName(updatedUser.getName());
-        user.setUser_link(updatedUser.getUser_link());
-        user.setPicture_link(updatedUser.getPicture_link());
+        user.setUserLink(updatedUser.getUserLink());
+        user.setPictureLink(updatedUser.getPictureLink());
         userRepository.save(user);
     }
 }
