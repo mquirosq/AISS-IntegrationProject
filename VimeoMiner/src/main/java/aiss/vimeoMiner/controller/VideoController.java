@@ -40,7 +40,7 @@ public class VideoController {
 
     @Operation(
             summary="Retrieve videos from channel",
-            description = "Get a List of VVideo objects belonging to the channel specified by id from YouTube",
+            description = "Get a List of VVideo objects belonging to the channel specified by id from Vimeo",
             tags= {"videos", "get", "channels"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
