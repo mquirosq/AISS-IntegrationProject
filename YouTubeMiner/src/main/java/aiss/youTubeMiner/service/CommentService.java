@@ -22,6 +22,15 @@ public class CommentService {
     @Autowired
     RestTemplate restTemplate;
 
+    private String genVideoURI(String videoId, Integer maxComments) {
+        String uri = Constants.ytBase + "/commentThreads";
+        uri += ("?videoId=" + videoId);
+        uri += ("&part=" + "snippet");
+        uri += ("&maxResults=" + maxComments);
+        uri += ("&key=" + Constants.apiKey);
+        return uri;
+    }
+
     public VUser getUser(String commentsId) throws CommentNotFoundException {
         try {
             Comment cm = getComment(commentsId);
@@ -73,13 +82,9 @@ public class CommentService {
         return out;
     }
 
-    public List<Comment> getCommentsFromVideo(String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
+    public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> out = new ArrayList<>();
-
-        String uri = Constants.ytBase + "/commentThreads";
-        uri += ("?videoId=" + videoId);
-        uri += ("&part=" + "snippet");
-        uri += ("&key=" + Constants.apiKey);
+        String next = null;
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<CommentSearch> request = new HttpEntity<CommentSearch>(headers);
@@ -87,7 +92,7 @@ public class CommentService {
         ResponseEntity<CommentSearch> response = null;
         try {
             response = restTemplate.exchange(
-                    uri,
+                    genVideoURI(videoId, maxComments),
                     HttpMethod.GET,
                     request,
                     CommentSearch.class
@@ -104,19 +109,15 @@ public class CommentService {
             if (response != null && response.getBody() != null) {
                 out.addAll(response.getBody().getItems());
             }
+            next = getNextPage(genVideoURI(videoId, (maxComments - out.size())), response);
 
-            String next = null;
-            if (response != null) {
-                next = getNextPage(uri, response);
-            }
-
-            while (next != null) {
+            while (out.size() < maxComments && next != null) {
                 response = restTemplate.exchange(next, HttpMethod.GET, null, CommentSearch.class);
 
                 if (response.getBody() != null) {
                     out.addAll(response.getBody().getItems());
                 }
-                next = getNextPage(uri, response);
+                next = getNextPage(genVideoURI(videoId, maxComments - out.size()), response);
             }
         } catch (RestClientResponseException | CommentNotFoundException e) {
             throw new CommentNotFoundException();

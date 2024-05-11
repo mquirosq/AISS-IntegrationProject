@@ -36,7 +36,7 @@ public class CommentServiceTests {
 
     @Test
     void createComment() throws VideoCommentsNotFoundException, CommentNotFoundException {
-        List<Comment> comments = commentService.getCommentsFromVideo(videoId);
+        List<Comment> comments = commentService.getCommentsFromVideo(videoId, 10);
         List<VComment> commentsRes = comments.stream().map(x -> {
                     try {
                         return commentService.createComment(videoId, x);
@@ -59,13 +59,13 @@ public class CommentServiceTests {
 
     @Test
     void getCommentsFromVideoPositive() throws VideoCommentsNotFoundException, CommentNotFoundException {
-        List<Comment> comments = commentService.getCommentsFromVideo(videoId);
+        List<Comment> comments = commentService.getCommentsFromVideo(videoId, 10);
         assertFalse(comments.isEmpty());
         comments.forEach(Assertions::assertNotNull);
     }
 
     @Test
-    void getCommentsFromVideoNegative() { assertThrows(CommentNotFoundException.class, ()-> commentService.getCommentsFromVideo("everlong"));}
+    void getCommentsFromVideoNegative() { assertThrows(CommentNotFoundException.class, ()-> commentService.getCommentsFromVideo("everlong", 10));}
 
     @Test
     void getUserPositive() throws CommentNotFoundException {

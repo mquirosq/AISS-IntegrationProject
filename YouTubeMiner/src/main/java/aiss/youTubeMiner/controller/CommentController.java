@@ -25,7 +25,7 @@ public class CommentController {
 
     @GetMapping("/videos/{videoId}/comments")
     public List<Comment> getCommentsFromVideo(@PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
-        return commentService.getCommentsFromVideo(videoId);
+        return commentService.getCommentsFromVideo(videoId, 10);
     }
 
 }
