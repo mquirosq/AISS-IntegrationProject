@@ -39,7 +39,7 @@ public class CommentController {
     })
     @GetMapping("/videos/{videoId}/comments")
     public List<VComment> findAll(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId,
-    @Parameter(description = "maximum number of comments that will be retrieved for each video") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws CaptionNotFoundException, CommentNotFoundException {
+    @Parameter(description = "maximum number of comments that will be retrieved for each video") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws CommentNotFoundException {
         List<Comment> comments = commentService.getComments("/videos/"+ videoId + "/comments", maxComments);
         List<VComment> vComments = new ArrayList<>();
         for (Comment comment : comments) {
