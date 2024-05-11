@@ -27,12 +27,16 @@ public class VideoServiceTests {
     @Test
     void getVideosPositive() throws VideoNotFoundException {
         List<VideoSnippet> videos = videoService.getVideos(channelId, 10);
-        assertFalse(videos.isEmpty());
+        assertFalse(videos.isEmpty(), "Resulting video list cannot be empty.");
         videos.forEach(Assertions::assertNotNull);
     }
 
     @Test
     void getVideosNegative() {
-        assertThrows(VideoNotFoundException.class, ()->videoService.getVideos("foo", 10));
+        assertThrows(
+                VideoNotFoundException.class,
+                ()->videoService.getVideos("foo", 10),
+                "Negative test must throw a VideoNotFoundException."
+        );
     }
 }

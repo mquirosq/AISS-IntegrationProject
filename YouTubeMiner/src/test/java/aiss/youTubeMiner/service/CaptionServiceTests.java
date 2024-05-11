@@ -21,12 +21,16 @@ public class CaptionServiceTests {
     @Test
     void getCaptionsPositive() throws CaptionNotFoundException {
         List<Caption> captions = captionService.getCaptions(videoId);
-        assertFalse(captions.isEmpty());
-        captions.forEach(Assertions::assertNotNull);
+        assertFalse(captions.isEmpty(), "Resulting captions list cannot be empty.");
+        captions.forEach(x->assertNotNull(x, "Resulting caption cannot be null."));
     }
 
     @Test
     void getCaptionsNegative() {
-        assertThrows(CaptionNotFoundException.class, ()->captionService.getCaptions("foo"));
+        assertThrows(
+                CaptionNotFoundException.class,
+                ()->captionService.getCaptions("foo"),
+                "Negative test should throw CaptionNotFoundException."
+        );
     }
 }
