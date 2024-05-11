@@ -22,9 +22,6 @@ public class VideoServiceTests {
     @Autowired
     VideoService videoService;
 
-    @Autowired
-    ChannelService channelService;
-
     final String channelId = "UCAuUUnT6oDeKwE6v1NGQxug";
 
     @Test
@@ -37,31 +34,5 @@ public class VideoServiceTests {
     @Test
     void getVideosNegative() {
         assertThrows(VideoNotFoundException.class, ()->videoService.getVideos("foo", 10));
-    }
-
-    @Test
-    void createVideos() throws VideoNotFoundException, ChannelNotFoundException, VideoMinerConnectionRefusedException {
-        Channel channel = channelService.getChannel(channelId);
-        channelService.createChannel(channel);
-
-        List<VideoSnippet> videos = videoService.getVideos(channelId, 70);
-        List<VVideo> videosRes = videos.stream().map(x -> {
-                    try {
-                        return videoService.createVideo(channelId, x);
-                    } catch (ChannelNotFoundException|VideoMinerConnectionRefusedException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
-
-        assertFalse(videosRes.isEmpty());
-
-        for (int i = 0; i < videosRes.size(); i++) {
-            assertNotNull(videosRes.get(i));
-            assertEquals(videosRes.get(i).getId(), videos.get(i).getId().getVideoId());
-            assertEquals(videosRes.get(i).getName(), videos.get(i).getSnippet().getTitle());
-            assertEquals(videosRes.get(i).getDescription(), videos.get(i).getSnippet().getDescription());
-            assertEquals(videosRes.get(i).getReleaseTime(), videos.get(i).getSnippet().getPublishedAt());
-        }
     }
 }

@@ -47,20 +47,6 @@ public class CaptionService {
         }
     }
 
-    public VCaption createCaption(String videoId, Caption caption) throws VideoMinerConnectionRefusedException, VideoNotFoundException {
-        try {
-            String uri = Constants.vmBase + "/videos/" + videoId + "/captions";
-            VCaption vCaption = transformCaption(caption);
-            HttpEntity<VCaption> request = new HttpEntity<>(vCaption);
-            ResponseEntity<VCaption> response = restTemplate.exchange(uri, HttpMethod.POST, request, VCaption.class);
-            return response.getBody();
-        } catch(HttpClientErrorException.NotFound e) {
-            throw new VideoNotFoundException();
-        } catch (ResourceAccessException e) {
-            throw new VideoMinerConnectionRefusedException();
-        }
-    }
-
     public VCaption transformCaption(Caption caption) {
         VCaption out = new VCaption();
         out.setId(caption.getId());
