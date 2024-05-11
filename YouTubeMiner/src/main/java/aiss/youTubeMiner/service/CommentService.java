@@ -180,7 +180,7 @@ public class CommentService {
         return out;
     }
 
-    public VUser transformUser(Comment comment) {
+    private VUser transformUser(Comment comment) {
         VUser out = new VUser();
         out.setName(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
         out.setPicture_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());

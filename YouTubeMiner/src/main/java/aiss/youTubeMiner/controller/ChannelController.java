@@ -26,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name="Channel", description="Channel management API using YouTube API")
 @RestController
