@@ -45,7 +45,7 @@ public class UserService {
         }
     }
     public VUser createUser(ModelUser modelUser) throws VideoMinerConnectionRefusedException, CommentNotFoundException {
-        String uri = videoMinerBaseUri + "/users";
+        String uri = videoMinerBaseUri + "comments/{commentId}/users";
         try {
             // Convert properties:
             VUser vUser = transformUser(modelUser);
