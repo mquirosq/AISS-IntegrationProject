@@ -27,10 +27,9 @@ public class CaptionController {
     @Autowired
     CaptionService captionService;
 
-
     @Operation(
             summary="Retrieve captions from video",
-            description = "Get a List of VCaption objects belonging to the video specified by id from YouTube",
+            description = "Get a List of VCaption objects belonging to the video specified by id from Vimeo",
             tags= {"captions", "get", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=

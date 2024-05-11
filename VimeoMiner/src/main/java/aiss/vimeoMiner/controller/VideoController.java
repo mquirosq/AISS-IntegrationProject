@@ -72,7 +72,6 @@ public class VideoController {
         List<Comment> comments = commentService.getComments(video.getMetadata().getConnections().getComments().getUri(), maxComments);
         for (Comment comment : comments) {
             VComment vComment = commentService.transformComment(comment);
-
             vVideo.getComments().add(vComment);
         }
         return vVideo;
