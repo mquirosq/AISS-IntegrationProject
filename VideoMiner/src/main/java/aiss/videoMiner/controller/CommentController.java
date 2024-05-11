@@ -65,7 +65,7 @@ public class CommentController {
     @Operation(
             summary="Retrieve all comments from a video",
             description = "Get a list of Comment objects belonging to the video with the given id",
-            tags= {"comments", "get", "id", "video"})
+            tags= {"comments", "get", "id", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Comment.class), mediaType="application/json")}),
@@ -79,7 +79,7 @@ public class CommentController {
     @Operation(
             summary="Insert a Comment in a video",
             description = "Add a new Comment whose data is passed in the body of the request in JSON format to the specified video by id",
-            tags= {"comments", "post", "id", "video"})
+            tags= {"comments", "post", "id", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {@Content(schema=
             @Schema(implementation=Comment.class), mediaType="application/json")}),

@@ -59,7 +59,7 @@ public class CaptionController {
     @Operation(
             summary="Retrieve all captions from a video",
             description = "Get a list of Caption objects belonging to the video with the given id",
-            tags= {"captions", "get", "id", "video"})
+            tags= {"captions", "get", "id", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Caption.class), mediaType="application/json")}),
@@ -73,7 +73,7 @@ public class CaptionController {
     @Operation(
             summary="Insert a Caption in a video",
             description = "Add a new Caption whose data is passed in the body of the request in JSON format to the specified video by id",
-            tags= {"captions", "post", "id", "video"})
+            tags= {"captions", "post", "id", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {@Content(schema=
             @Schema(implementation=Caption.class), mediaType="application/json")}),
