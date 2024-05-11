@@ -5,7 +5,6 @@ import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.service.CaptionService;
 import aiss.youTubeMiner.service.CommentService;
 import aiss.youTubeMiner.service.VideoService;
-import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.service.ChannelService;
@@ -20,12 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Tag(name="Channel", description="Channel management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBase + "/channels")
+@RequestMapping(Constants.apiBaseUri + "/channels")
 public class ChannelController {
 
     @Autowired
@@ -48,7 +44,7 @@ public class ChannelController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("{channelId}")
-    public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException {
+    public VChannel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException {
         return channelService.transformChannel(channelService.getChannel(channelId));
     }
 

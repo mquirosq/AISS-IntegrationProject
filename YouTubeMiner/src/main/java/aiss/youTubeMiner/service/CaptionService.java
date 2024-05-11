@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class CaptionService {
     RestTemplate restTemplate;
 
     public List<Caption> getCaptions(String videoId) throws CaptionNotFoundException {
-        String uri = Constants.ytBase + "/captions";
+        String uri = Constants.ytBaseUri + "/captions";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
         uri += ("&key=" + Constants.apiKey);
@@ -49,7 +48,7 @@ public class CaptionService {
 
     public VCaption createCaption(String videoId, Caption caption) throws VideoMinerConnectionRefusedException, VideoNotFoundException {
         try {
-            String uri = Constants.vmBase + "/videos/" + videoId + "/captions";
+            String uri = Constants.vmBaseUri + "/videos/" + videoId + "/captions";
             VCaption vCaption = transformCaption(caption);
             HttpEntity<VCaption> request = new HttpEntity<>(vCaption);
             ResponseEntity<VCaption> response = restTemplate.exchange(uri, HttpMethod.POST, request, VCaption.class);

@@ -3,7 +3,6 @@ package aiss.youTubeMiner.controller;
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.service.CommentService;
-import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.videoModel.VUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(Constants.apiBase)
+@RequestMapping(Constants.apiBaseUri)
 public class UserController {
 
     @Autowired

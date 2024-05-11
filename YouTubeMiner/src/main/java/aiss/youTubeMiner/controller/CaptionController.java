@@ -23,7 +23,7 @@ import java.util.List;
 
 @Tag(name="Caption", description="Caption management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBase + "/videos")
+@RequestMapping(Constants.apiBaseUri + "/videos")
 public class CaptionController {
     @Autowired
     CaptionService captionService;

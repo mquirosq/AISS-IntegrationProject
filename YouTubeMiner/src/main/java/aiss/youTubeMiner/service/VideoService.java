@@ -21,7 +21,7 @@ public class VideoService {
     RestTemplate restTemplate;
 
     private String genURI(String channelId, Integer maxVideos) {
-        String uri = Constants.ytBase + "/search";
+        String uri = Constants.ytBaseUri + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
@@ -82,7 +82,7 @@ public class VideoService {
 
     public VVideo createVideo(String channelId, VideoSnippet video) throws ChannelNotFoundException, VideoMinerConnectionRefusedException {
         try {
-            String uri = Constants.vmBase + "/channels/" + channelId + "/videos";
+            String uri = Constants.vmBaseUri + "/channels/" + channelId + "/videos";
             VVideo vVideo = transformVideo(video);
             HttpEntity<VVideo> request = new HttpEntity<>(vVideo);
             ResponseEntity<VVideo> response = restTemplate.exchange(uri, HttpMethod.POST, request, VVideo.class);

@@ -11,7 +11,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class ChannelService {
     public RestTemplate restTemplate;
 
     public Channel getChannel(String channelId) throws ChannelNotFoundException {
-        String uri = Constants.ytBase + "/channels";
+        String uri = Constants.ytBaseUri + "/channels";
         uri += ("?id=" + channelId);
         uri += ("&part=" + "snippet");
         uri += ("&key=" + Constants.apiKey);
@@ -45,7 +44,7 @@ public class ChannelService {
 
     public VChannel createChannel(Channel channel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         try {
-            String uri = Constants.vmBase + "/channels";
+            String uri = Constants.vmBaseUri + "/channels";
             VChannel vChannel = transformChannel(channel);
             HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
             ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);

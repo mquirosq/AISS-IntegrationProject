@@ -35,7 +35,7 @@ public class CommentService {
         List<Comment> aux = new ArrayList<>();
         Comment out = new Comment();
 
-        String uri = Constants.ytBase + "/commentThreads";
+        String uri = Constants.ytBaseUri + "/commentThreads";
         uri += ("?id=" + commentsId);
         uri += ("&part=" + "snippet");
         uri += ("&key=" + Constants.apiKey);
@@ -76,7 +76,7 @@ public class CommentService {
     public List<Comment> getCommentsFromVideo(String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> out = new ArrayList<>();
 
-        String uri = Constants.ytBase + "/commentThreads";
+        String uri = Constants.ytBaseUri + "/commentThreads";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
         uri += ("&key=" + Constants.apiKey);
@@ -141,7 +141,7 @@ public class CommentService {
 
     public VComment createComment(String videoId, Comment comment) throws VideoMinerConnectionRefusedException, VideoCommentsNotFoundException {
         try {
-            String uri = Constants.vmBase + "/videos/" + videoId + "/comments";
+            String uri = Constants.vmBaseUri + "/videos/" + videoId + "/comments";
             VComment vComment = transformComment(comment);
             HttpEntity<VComment> request = new HttpEntity<>(vComment);
             ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
@@ -155,7 +155,7 @@ public class CommentService {
     
     public VUser createUser(String commentId) throws VideoMinerConnectionRefusedException, CommentNotFoundException {
         try {
-            String uri = Constants.vmBase + "/comments/" + commentId + "/user";
+            String uri = Constants.vmBaseUri + "/comments/" + commentId + "/user";
             VUser vUser = getUser(commentId);
             HttpEntity<VUser> request = new HttpEntity<>(vUser);
             ResponseEntity<VUser> response = restTemplate.exchange(uri, HttpMethod.POST, request, VUser.class);
