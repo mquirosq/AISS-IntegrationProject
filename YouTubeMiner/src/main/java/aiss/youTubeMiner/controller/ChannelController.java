@@ -33,8 +33,8 @@ public class ChannelController {
     CaptionService captionService;
 
     @GetMapping("{channelId}")
-    public Channel findOne(@PathVariable String channelId) throws ChannelNotFoundException {
-        return channelService.getChannel(channelId);
+    public VChannel findOne(@PathVariable String channelId) throws ChannelNotFoundException {
+        return channelService.transformChannel(channelService.getChannel(channelId));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,7 +44,7 @@ public class ChannelController {
                                 @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
             throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException {
 
-        Channel channel = findOne(channelId);
+        Channel channel = channelService.getChannel(channelId);
         VChannel out = channelService.createChannel(channel);
 
         if (maxVideos > 0) {
@@ -59,9 +59,9 @@ public class ChannelController {
         if ( maxComments > 0) {
             out.getVideos().forEach(x -> {
                 try {
-                    commentService.getCommentsFromVideo(x.getId()).forEach( c -> {
+                    commentService.getCommentsFromVideo(x.getId()).forEach(c -> {
                         try {
-                            x.getComments().add(commentService.createComment(c, x.getId()));
+                            x.getComments().add(commentService.createComment(x.getId(), c));
                         } catch (VideoMinerConnectionRefusedException | VideoCommentsNotFoundException e) {
                             throw new RuntimeException(e);
                         }

@@ -169,7 +169,7 @@ public class CommentService {
         }
     }
 
-    private VComment transformComment(Comment comment) {
+    public VComment transformComment(Comment comment) {
         VComment out = new VComment();
         VUser aux = transformUser(comment);
         out.setId(comment.getCommentSnippet().getTopLevelComment().getId());
@@ -179,7 +179,7 @@ public class CommentService {
         return out;
     }
 
-    private VUser transformUser(Comment comment) {
+    public VUser transformUser(Comment comment) {
         VUser out = new VUser();
         out.setName(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
         out.setPicture_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());

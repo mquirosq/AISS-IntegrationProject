@@ -3,6 +3,7 @@ package aiss.youTubeMiner.controller;
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
 import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VUser;
 import aiss.youTubeMiner.youTubeModel.comment.Comment;
 import aiss.youTubeMiner.service.CommentService;
@@ -19,13 +20,13 @@ public class CommentController {
     CommentService commentService;
 
     @GetMapping("/comments/{commentId}")
-    public Comment getComment(@PathVariable String commentId) throws CommentNotFoundException {
-        return commentService.getComment(commentId);
+    public VComment getComment(@PathVariable String commentId) throws CommentNotFoundException {
+        return commentService.transformComment(commentService.getComment(commentId));
     }
 
     @GetMapping("/videos/{videoId}/comments")
-    public List<Comment> getCommentsFromVideo(@PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
-        return commentService.getCommentsFromVideo(videoId);
+    public List<VComment> getCommentsFromVideo(@PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
+        return commentService.getCommentsFromVideo(videoId).stream().map(x->commentService.transformComment(x)).toList();
     }
 
 }

@@ -94,7 +94,7 @@ public class VideoService {
         }
     }
 
-    private VVideo transformVideo(VideoSnippet video) {
+    public VVideo transformVideo(VideoSnippet video) {
         VVideo out = new VVideo();
         out.setId(video.getId().getVideoId());
         out.setName(video.getSnippet().getTitle());
