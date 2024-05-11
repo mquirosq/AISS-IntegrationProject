@@ -29,7 +29,7 @@ class VideoServiceTest {
     void getVideos() throws VideoNotFoundException {
         Integer maxVideos = 2;
         List<Video> videos = videoService.getVideos("/channels/1470975/videos", maxVideos);
-        assertEquals(maxVideos, videos.size(), "The video should have the size of the maxVideos");
+        assertEquals(maxVideos, videos.size(), "The video list should have the size of the maxVideos");
         videos.forEach(v -> {
             assertNotNull(v.getName(), "The name of the video should not be null");
         });

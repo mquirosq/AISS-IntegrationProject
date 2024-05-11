@@ -23,8 +23,10 @@ public class CommentServiceTest {
 
     @Test
     void getComments() throws CommentNotFoundException {
-        String videoId = "371426411";
-        List<Comment> comments = service.getComments("/videos/371426411/comments", 10);
+        String videoId = "322774604";
+        Integer maxComments = 3;
+        List<Comment> comments = service.getComments("/videos/" + videoId + "/comments", maxComments);
+        assertEquals(maxComments, comments.size(), "The comment list should have the size of the maxComments");
         comments.forEach(c -> assertEquals(videoId, c.getUri().split("/")[2],"Returned comment Uri should match given video ID"));
     }
 
