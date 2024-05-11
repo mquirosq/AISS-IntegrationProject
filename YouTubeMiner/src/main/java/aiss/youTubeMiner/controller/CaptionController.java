@@ -29,7 +29,7 @@ public class CaptionController {
     CaptionService captionService;
 
     @Operation(
-            summary="Retrieve a Captions from video",
+            summary="Retrieve Captions from video",
             description = "Get a List of Caption objects belonging to the video specified by id from YouTube",
             tags= {"captions", "get", "videos"})
     @ApiResponses({
@@ -38,7 +38,7 @@ public class CaptionController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/{videoId}/captions")
-    public List<VCaption> findAll(@Parameter(description = "id of the video to which the captions belong to") @PathVariable String videoId) throws CaptionNotFoundException {
+    public List<VCaption> findAll(@Parameter(description = "id of the video to which the captions belong") @PathVariable String videoId) throws CaptionNotFoundException {
         List<Caption> captions = captionService.getCaptions(videoId);
         List<VCaption> vCaptions = new ArrayList<>();
         for (Caption caption : captions){
