@@ -2,11 +2,8 @@ package aiss.vimeoMiner.controller;
 
 import aiss.vimeoMiner.exception.CaptionNotFoundException;
 import aiss.vimeoMiner.exception.CommentNotFoundException;
-import aiss.vimeoMiner.service.CaptionService;
 import aiss.vimeoMiner.service.CommentService;
-import aiss.vimeoMiner.videoModel.VCaption;
 import aiss.vimeoMiner.videoModel.VComment;
-import aiss.vimeoMiner.vimeoModel.modelCaption.Caption;
 import aiss.vimeoMiner.vimeoModel.modelComment.Comment;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
