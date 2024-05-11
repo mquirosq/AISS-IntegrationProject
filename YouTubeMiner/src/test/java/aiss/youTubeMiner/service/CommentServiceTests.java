@@ -28,28 +28,46 @@ public class CommentServiceTests {
     @Test
     void getCommentPositive() throws CommentNotFoundException {
         Comment comment = commentService.getComment(commentId);
-        assertNotNull(comment);
+        assertNotNull(comment, "Resulting comment cannot be null.");
     }
 
     @Test
-    void getCommentNegative() {assertThrows(CommentNotFoundException.class, ()->commentService.getComment("fighters"));}
+    void getCommentNegative() {
+        assertThrows(
+                CommentNotFoundException.class,
+                ()->commentService.getComment("fighters"),
+                "Negative test must throw a CommentNotFoundException."
+        );
+    }
 
     @Test
     void getCommentsFromVideoPositive() throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> comments = commentService.getCommentsFromVideo(videoId, 10);
-        assertFalse(comments.isEmpty());
-        comments.forEach(Assertions::assertNotNull);
+        assertFalse(comments.isEmpty(), "Resulting comment list must not be empty.");
+        comments.forEach(x->assertNotNull(x, "Resulting comment cannot be null."));
     }
 
     @Test
-    void getCommentsFromVideoNegative() { assertThrows(CommentNotFoundException.class, ()-> commentService.getCommentsFromVideo("everlong", 10));}
+    void getCommentsFromVideoNegative() {
+        assertThrows(
+                CommentNotFoundException.class,
+                ()->commentService.getCommentsFromVideo("everlong", 10),
+                "Negative test must throw a CommentNotFoundException."
+        );
+    }
 
     @Test
     void getUserPositive() throws CommentNotFoundException {
         VUser user = commentService.getUser(commentId);
-        assertNotNull(user);
+        assertNotNull(user, "Resulting user cannot be null.");
     }
 
     @Test
-    void getUserNegative() { assertThrows(CommentNotFoundException.class, ()-> commentService.getUser("comment"));}
+    void getUserNegative() {
+        assertThrows(
+                CommentNotFoundException.class,
+                ()->commentService.getUser("comment"),
+                "Negative test must throw CommentNotFoundException."
+        );
+    }
 }
