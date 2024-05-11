@@ -61,7 +61,7 @@ public class CaptionService {
         }
     }
 
-    private VCaption transformCaption(Caption caption) {
+    public VCaption transformCaption(Caption caption) {
         VCaption out = new VCaption();
         out.setId(caption.getId());
         out.setName(caption.getSnippet().getName());
