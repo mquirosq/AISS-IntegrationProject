@@ -60,7 +60,7 @@ public class VideoService {
                 next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
             }
             return out;
-        } catch (RestClientResponseException e) {
+        } catch (HttpClientErrorException.NotFound e) {
             throw new VideoNotFoundException();
         }
     }
@@ -94,7 +94,7 @@ public class VideoService {
         }
     }
 
-    private VVideo transformVideo(VideoSnippet video) {
+    public VVideo transformVideo(VideoSnippet video) {
         VVideo out = new VVideo();
         out.setId(video.getId().getVideoId());
         out.setName(video.getSnippet().getTitle());

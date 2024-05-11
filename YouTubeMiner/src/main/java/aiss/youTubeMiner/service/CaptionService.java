@@ -42,7 +42,7 @@ public class CaptionService {
                     CaptionSearch.class
             );
             return response.getBody().getItems();
-        } catch (NullPointerException|RestClientResponseException e) {
+        } catch (NullPointerException|HttpClientErrorException.NotFound e) {
             throw new CaptionNotFoundException();
         }
     }
@@ -61,7 +61,7 @@ public class CaptionService {
         }
     }
 
-    private VCaption transformCaption(Caption caption) {
+    public VCaption transformCaption(Caption caption) {
         VCaption out = new VCaption();
         out.setId(caption.getId());
         out.setName(caption.getSnippet().getName());

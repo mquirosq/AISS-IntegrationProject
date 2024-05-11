@@ -38,7 +38,7 @@ public class ChannelService {
                     ChannelSearch.class
             );
             return response.getBody().getItems().get(0);
-        } catch (NullPointerException|RestClientResponseException e) {
+        } catch (NullPointerException|HttpClientErrorException.NotFound e) {
             throw new ChannelNotFoundException();
         }
     }
@@ -57,7 +57,7 @@ public class ChannelService {
         }
     }
 
-    private VChannel transformChannel(Channel channel) {
+    public VChannel transformChannel(Channel channel) {
         VChannel out = new VChannel();
         out.setId(channel.getId());
         out.setDescription(channel.getSnippet().getDescription());
