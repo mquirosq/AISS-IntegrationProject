@@ -6,10 +6,9 @@ import aiss.videoMiner.exception.OrderByPropertyDoesNotExistChannelException;
 import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.model.Video;
 import aiss.videoMiner.repository.ChannelRepository;
+import aiss.videoMiner.repository.VideoRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,6 +22,7 @@ import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +36,8 @@ import static aiss.videoMiner.helper.PaginationHelper.getPageable;
 public class ChannelController {
     @Autowired
     ChannelRepository channelRepository;
+    @Autowired
+    VideoRepository videoRepository;
 
     @Operation(
             summary="Retrieve all Channels",
@@ -126,10 +128,20 @@ public class ChannelController {
             throw new ChannelNotFoundException();
         }
         Channel channel = channelOptional.get();
+
         channel.setName(updatedChannel.getName());
         channel.setDescription(updatedChannel.getDescription());
         channel.setCreatedTime(updatedChannel.getCreatedTime());
+
+        List<Video> previousVideos = new ArrayList<Video>(channel.getVideos());
+        channel.setVideos(updatedChannel.getVideos());
+
         channelRepository.save(channel);
+
+        for (Video video : previousVideos){
+            String videoId = video.getId();
+            videoRepository.deleteById(videoId);
+        }
     }
 
     @Operation(
