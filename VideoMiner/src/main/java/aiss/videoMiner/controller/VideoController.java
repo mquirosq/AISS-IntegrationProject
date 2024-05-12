@@ -1,11 +1,8 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.*;
-import aiss.videoMiner.model.Caption;
-import aiss.videoMiner.model.Channel;
-import aiss.videoMiner.model.Video;
-import aiss.videoMiner.repository.ChannelRepository;
-import aiss.videoMiner.repository.VideoRepository;
+import aiss.videoMiner.model.*;
+import aiss.videoMiner.repository.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,6 +17,7 @@ import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +34,12 @@ public class VideoController {
     VideoRepository videoRepository;
     @Autowired
     ChannelRepository channelRepository;
+    @Autowired
+    CommentRepository commentRepository;
+    @Autowired
+    CaptionRepository captionRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Operation(
             summary="Retrieve all Videos",
@@ -158,6 +162,25 @@ public class VideoController {
         video.setName(updatedVideo.getName());
         video.setDescription(updatedVideo.getDescription());
         video.setReleaseTime(updatedVideo.getReleaseTime());
+
+        List<Comment> previousComments = new ArrayList<>(video.getComments());
+        video.setComments(updatedVideo.getComments());
+        List<Caption> previousCaptions = new ArrayList<>(video.getCaptions());
+        video.setCaptions(updatedVideo.getCaptions());
+
+
+        videoRepository.save(video);
+
+        for (Comment comment : previousComments){
+            User user = commentRepository.findById(comment.getId()).get().getAuthor();
+            commentRepository.deleteById(comment.getId());
+            userRepository.deleteById(user.getId());
+        }
+
+        for (Caption caption : previousCaptions){
+            captionRepository.deleteById(caption.getId());
+        }
+
         videoRepository.save(video);
     }
 
