@@ -13,16 +13,16 @@ public class Authenticator {
     String token;
 
     public Authenticator() {
-        System.out.println("\nOAuth 2.0 authentication is enabled.\nPlease authenticate at " + Constants.loginBase + "\n");
+        System.out.println("\nOAuth 2.0 authentication is enabled.\nPlease authenticate at " + Constants.ipBase + "/login\n");
         this.token = null;
     }
 
     public String authRequest() {
-        String uri = "https://accounts.google.com/o/oauth2/v2/auth";
+        String uri = Constants.oauthBase;
                 uri += ("?client_id=" + Constants.clientId);
                 uri += ("&response_type=" + "code");
-                uri += ("&scope=" + "https://www.googleapis.com/auth/youtube");
-                uri += ("&redirect_uri=" + "http://localhost:8082");
+                uri += ("&scope=" + Constants.ytScope);
+                uri += ("&redirect_uri=" + Constants.ipBase);
         ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, null, String.class);
         return response.getBody();
     }
