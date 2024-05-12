@@ -69,18 +69,18 @@ public class CaptionController {
         else
             paging = PageRequest.of(offset, limit);
 
-        Page<Caption> pageChannels;
+        Page<Caption> pageCaptions;
 
         try{
             if (language != null)
-                pageChannels = captionRepository.findByLanguage(language, paging);
+                pageCaptions = captionRepository.findByLanguage(language, paging);
             else
-                pageChannels = captionRepository.findAll(paging);
+                pageCaptions = captionRepository.findAll(paging);
         }
         catch(PropertyReferenceException err){
             throw new OrderByPropertyDoesNotExistCaptionException();
         }
-        return pageChannels.getContent();
+        return pageCaptions.getContent();
     }
 
     @Operation(
