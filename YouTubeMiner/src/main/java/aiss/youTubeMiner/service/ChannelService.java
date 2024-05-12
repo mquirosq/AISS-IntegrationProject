@@ -1,7 +1,7 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.*;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
@@ -11,7 +11,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -26,10 +25,10 @@ public class ChannelService {
     VideoService videoService;
 
     public Channel getChannel(String channelId) throws ChannelNotFoundException {
-        String uri = Constants.ytBaseUri + "/channels";
+        String uri = ConstantsHelper.ytBaseUri + "/channels";
         uri += ("?id=" + channelId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + Constants.apiKey);
+        uri += ("&key=" + ConstantsHelper.apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<ChannelSearch> request = new HttpEntity<>(headers);
@@ -49,7 +48,7 @@ public class ChannelService {
 
     public VChannel createChannel(VChannel vChannel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         try {
-            String uri = Constants.vmBaseUri + "/channels";
+            String uri = ConstantsHelper.vmBaseUri + "/channels";
             HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
             ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);
             return response.getBody();

@@ -2,7 +2,7 @@ package aiss.youTubeMiner.controller;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.videoModel.VComment;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag(name = "Comment", description = "Comment management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBaseUri)
+@RequestMapping(ConstantsHelper.apiBaseUri)
 public class CommentController {
 
     @Autowired

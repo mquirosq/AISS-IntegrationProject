@@ -1,6 +1,6 @@
 package aiss.youTubeMiner.controller;
 
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
 import aiss.youTubeMiner.service.CaptionService;
@@ -23,7 +23,7 @@ import java.util.List;
 
 @Tag(name="Caption", description="Caption management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBaseUri + "/videos")
+@RequestMapping(ConstantsHelper.apiBaseUri + "/videos")
 public class CaptionController {
     @Autowired
     CaptionService captionService;

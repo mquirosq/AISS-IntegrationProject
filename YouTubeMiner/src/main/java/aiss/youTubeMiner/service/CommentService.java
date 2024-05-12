@@ -2,7 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VUser;
 import aiss.youTubeMiner.youTubeModel.comment.*;
@@ -22,11 +22,11 @@ public class CommentService {
     RestTemplate restTemplate;
 
     private String genVideoURI(String videoId, Integer maxComments) {
-        String uri = Constants.ytBaseUri + "/commentThreads";
+        String uri = ConstantsHelper.ytBaseUri + "/commentThreads";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
         uri += ("&maxResults=" + maxComments);
-        uri += ("&key=" + Constants.apiKey);
+        uri += ("&key=" + ConstantsHelper.apiKey);
         return uri;
     }
 
@@ -43,10 +43,10 @@ public class CommentService {
         List<Comment> aux = new ArrayList<>();
         Comment out = new Comment();
 
-        String uri = Constants.ytBaseUri + "/commentThreads";
+        String uri = ConstantsHelper.ytBaseUri + "/commentThreads";
         uri += ("?id=" + commentsId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + Constants.apiKey);
+        uri += ("&key=" + ConstantsHelper.apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<CommentSearch> request = new HttpEntity<>(headers);

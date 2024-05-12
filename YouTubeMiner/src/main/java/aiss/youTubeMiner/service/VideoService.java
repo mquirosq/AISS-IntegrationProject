@@ -1,7 +1,7 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.*;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VVideo;
@@ -27,12 +27,12 @@ public class VideoService {
     CommentService commentService;
 
     private String genURI(String channelId, Integer maxVideos) {
-        String uri = Constants.ytBaseUri + "/search";
+        String uri = ConstantsHelper.ytBaseUri + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
         uri += ("&maxResults=" + ((maxVideos > 50) ? 50 : maxVideos));
-        uri += ("&key=" + Constants.apiKey);
+        uri += ("&key=" + ConstantsHelper.apiKey);
         return uri;
     }
 

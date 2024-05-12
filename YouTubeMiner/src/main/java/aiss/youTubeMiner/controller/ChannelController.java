@@ -1,7 +1,7 @@
 package aiss.youTubeMiner.controller;
 
 import aiss.youTubeMiner.exception.*;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.service.CaptionService;
 import aiss.youTubeMiner.service.CommentService;
 import aiss.youTubeMiner.service.VideoService;
@@ -29,7 +29,7 @@ import java.util.List;
 
 @Tag(name="Channel", description="Channel management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBaseUri + "/channels")
+@RequestMapping(ConstantsHelper.apiBaseUri + "/channels")
 public class ChannelController {
 
     @Autowired
