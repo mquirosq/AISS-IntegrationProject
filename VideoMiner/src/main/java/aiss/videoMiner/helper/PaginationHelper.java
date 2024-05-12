@@ -5,10 +5,9 @@ import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.User;
 import aiss.videoMiner.model.Video;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.data.domain.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,11 +15,31 @@ import java.util.List;
 
 public class PaginationHelper {
 
-    public static Page<Video> getVideoPage(int offset, int limit, List<Video> videos, String orderBy) throws OrderByPropertyDoesNotExistVideoException, InvalidPageParametersException {
+    public static Pageable getPageable(@RequestParam(name = "offset", defaultValue = "0") @Parameter(description = "page to retrieve") int offset, @RequestParam(name = "limit", defaultValue = "10") @Parameter(description = "maximum number of comments per page") int limit, @RequestParam(name = "orderBy", required = false) @Parameter(description = "takes as value one of the properties of the comment and orders the comments by that parameter, ascending by default. To get the descending order add a - just before the name of the property") String orderBy) {
+        Pageable paging;
 
+        if (orderBy != null){
+            if (orderBy.startsWith("-")){
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+            }
+            else {
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
+            }
+        }
+        else
+            paging = PageRequest.of(offset, limit);
+        return paging;
+    }
+
+    public static void checkOffsetAndLimitValidity(@RequestParam(name = "offset", defaultValue = "0") @Parameter(description = "page to retrieve") int offset, @RequestParam(name = "limit", defaultValue = "10") @Parameter(description = "maximum number of comments per page") int limit) throws InvalidPageParametersException {
         if (limit <= 0 || offset < 0){
             throw new InvalidPageParametersException();
         }
+    }
+
+    public static Page<Video> getVideoPage(int offset, int limit, List<Video> videos, String orderBy) throws OrderByPropertyDoesNotExistVideoException, InvalidPageParametersException {
+
+        checkOffsetAndLimitValidity(offset, limit);
 
         Pageable pageRequest = PageRequest.of(offset, limit);
 
@@ -58,9 +77,7 @@ public class PaginationHelper {
 
     public static Page<Caption> getCaptionPage(int offset, int limit, List<Caption> captions, String orderBy) throws OrderByPropertyDoesNotExistCaptionException, InvalidPageParametersException {
 
-        if (limit <= 0 || offset < 0){
-            throw new InvalidPageParametersException();
-        }
+        checkOffsetAndLimitValidity(offset, limit);
 
         Pageable pageRequest = PageRequest.of(offset, limit);
 
@@ -94,9 +111,7 @@ public class PaginationHelper {
 
     public static Page<Comment> getCommentPage(int offset, int limit, List<Comment> comments, String orderBy) throws OrderByPropertyDoesNotExistCommentException, InvalidPageParametersException {
 
-        if (limit <= 0 || offset < 0){
-            throw new InvalidPageParametersException();
-        }
+        checkOffsetAndLimitValidity(offset, limit);
 
         Pageable pageRequest = PageRequest.of(offset, limit);
 

@@ -52,22 +52,9 @@ public class VideoController {
                                @Parameter(description = "string that must be included in the name of the video") @RequestParam(name="name", required = false) String name,
                                @Parameter(description = "takes as value one of the properties of the video and orders the videos by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws OrderByPropertyDoesNotExistVideoException, InvalidPageParametersException {
 
-        if (limit <= 0 || offset < 0){
-            throw new InvalidPageParametersException();
-        }
+        checkOffsetAndLimitValidity(offset, limit);
 
-        Pageable paging;
-
-        if (orderBy != null){
-            if (orderBy.startsWith("-")){
-                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
-            }
-            else {
-                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
-            }
-        }
-        else
-            paging = PageRequest.of(offset, limit);
+        Pageable paging = getPageable(offset, limit, orderBy);
 
         Page<Video> pageVideos;
 

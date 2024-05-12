@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
+import static aiss.videoMiner.helper.PaginationHelper.checkOffsetAndLimitValidity;
+import static aiss.videoMiner.helper.PaginationHelper.getPageable;
 
 @Tag(name="User", description = "User management API")
 @RestController
@@ -56,22 +58,9 @@ public class UserController {
                               @Parameter(description = "takes as value one of the properties of the user and orders the users by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
             throws OrderByPropertyDoesNotExistUserException, InvalidPageParametersException {
 
-        if (limit <= 0 || offset < 0){
-            throw new InvalidPageParametersException();
-        }
+        checkOffsetAndLimitValidity(offset, limit);
 
-        Pageable paging;
-
-        if (orderBy != null){
-            if (orderBy.startsWith("-")){
-                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
-            }
-            else {
-                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
-            }
-        }
-        else
-            paging = PageRequest.of(offset, limit);
+        Pageable paging = getPageable(offset, limit, orderBy);
 
         Page<User> pageCaptions;
 
