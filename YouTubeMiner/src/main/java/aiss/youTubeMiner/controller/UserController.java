@@ -1,6 +1,7 @@
 package aiss.youTubeMiner.controller;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.service.CommentService;
 import aiss.youTubeMiner.videoModel.VUser;
@@ -33,7 +34,7 @@ public class UserController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/comments/{commentId}/user")
-    public VUser getUser(@Parameter(description = "id of the comment from which the user the author of") @PathVariable String commentId) throws CommentNotFoundException {
-        return commentService.getUser(commentId);
+    public VUser getUser(@Parameter(description = "id of the comment from which the user the author of") @PathVariable String commentId) throws CommentNotFoundException, OAuthException {
+        return commentService.getUser(commentId, false);
     }
 }

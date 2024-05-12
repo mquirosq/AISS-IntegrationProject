@@ -1,9 +1,9 @@
 package aiss.youTubeMiner.service;
 
-import aiss.youTubeMiner.exception.*;
+import aiss.youTubeMiner.exception.OAuthException;
+import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.helper.ConstantsHelper;
-import aiss.youTubeMiner.videoModel.VCaption;
-import aiss.youTubeMiner.videoModel.VComment;
+import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
@@ -26,25 +26,35 @@ public class VideoService {
     @Autowired
     CommentService commentService;
 
-    private String genURI(String channelId, Integer maxVideos) {
+    @Autowired
+    Authenticator authenticator;
+
+    private String genURI(String channelId, Integer maxVideos, Boolean test) {
         String uri = ConstantsHelper.ytBaseUri + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
         uri += ("&maxResults=" + ((maxVideos > 50) ? 50 : maxVideos));
-        uri += ("&key=" + ConstantsHelper.apiKey);
+
+        if (test) {
+            uri += ("&key=" + ConstantsHelper.apiKey);
+        }
         return uri;
     }
 
-    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos) throws VideoNotFoundException {
-        HttpHeaders headers = new HttpHeaders();
+    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos, Boolean test) throws VideoNotFoundException, OAuthException {
+        HttpHeaders headers = null;
+        if (!test) {
+            headers = authenticator.getAuthHeader();
+        }
         HttpEntity<VideoSnippetSearch> request = new HttpEntity<>(headers);
 
         try {
             List<VideoSnippet> out = null;
             String next = null;
+
             ResponseEntity<VideoSnippetSearch> response = restTemplate.exchange(
-                    genURI(channelId, maxVideos),
+                    genURI(channelId, maxVideos, test),
                     HttpMethod.GET,
                     request,
                     VideoSnippetSearch.class
@@ -55,7 +65,7 @@ public class VideoService {
             } else {
                 return null;
             }
-            next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
+            next = getNextPage(genURI(channelId, maxVideos - out.size(), test), response);
 
             while (out.size() < maxVideos && next != null) {
                 response = restTemplate.exchange(next, HttpMethod.GET, request, VideoSnippetSearch.class);
@@ -63,10 +73,10 @@ public class VideoService {
                 if (response.getBody() != null) {
                     out.addAll(response.getBody().getItems());
                 }
-                next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
+                next = getNextPage(genURI(channelId, maxVideos - out.size(), test), response);
             }
             return out;
-        } catch (HttpClientErrorException.NotFound e) {
+        } catch (HttpClientErrorException e) {
             throw new VideoNotFoundException();
         }
     }

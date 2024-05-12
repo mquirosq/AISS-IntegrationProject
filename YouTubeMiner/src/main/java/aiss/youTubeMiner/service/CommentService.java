@@ -1,15 +1,22 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
-import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.helper.ConstantsHelper;
+import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VUser;
-import aiss.youTubeMiner.youTubeModel.comment.*;
+import aiss.youTubeMiner.youTubeModel.comment.Comment;
+import aiss.youTubeMiner.youTubeModel.comment.CommentSearch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.*;
-import org.springframework.http.*;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,34 +28,45 @@ public class CommentService {
     @Autowired
     RestTemplate restTemplate;
 
-    private String genVideoURI(String videoId, Integer maxComments) {
+    @Autowired
+    Authenticator authenticator;
+
+    private String genVideoURI(String videoId, Integer maxComments, Boolean test) {
         String uri = ConstantsHelper.ytBaseUri + "/commentThreads";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
         uri += ("&maxResults=" + maxComments);
-        uri += ("&key=" + ConstantsHelper.apiKey);
+
+        if (test) {
+            uri += ("&key=" + ConstantsHelper.apiKey);
+        }
         return uri;
     }
 
-    public VUser getUser(String commentsId) throws CommentNotFoundException {
+    public VUser getUser(String commentsId, Boolean test) throws CommentNotFoundException, OAuthException {
         try {
-            Comment cm = getComment(commentsId);
+            Comment cm = getComment(commentsId, test);
             return transformUser(cm);
         } catch (CommentNotFoundException e) {
             throw new CommentNotFoundException();
         }
     }
 
-    public Comment getComment(String commentsId) throws CommentNotFoundException {
+    public Comment getComment(String commentsId, Boolean test) throws CommentNotFoundException, OAuthException {
         List<Comment> aux = new ArrayList<>();
         Comment out = new Comment();
 
         String uri = ConstantsHelper.ytBaseUri + "/commentThreads";
         uri += ("?id=" + commentsId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + ConstantsHelper.apiKey);
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = null;
+
+        if (test) {
+            uri += ("&key=" + ConstantsHelper.apiKey);
+        } else {
+            headers = authenticator.getAuthHeader();
+        }
         HttpEntity<CommentSearch> request = new HttpEntity<>(headers);
 
         ResponseEntity<CommentSearch> response = restTemplate.exchange(
@@ -67,7 +85,7 @@ public class CommentService {
             String next = getNextPage(uri, response);
 
             while (next != null) {
-                response = restTemplate.exchange(next, HttpMethod.GET, null, CommentSearch.class);
+                response = restTemplate.exchange(next, HttpMethod.GET, request, CommentSearch.class);
 
                 if (response.getBody() != null) {
                     aux.addAll(response.getBody().getItems());
@@ -75,24 +93,28 @@ public class CommentService {
                 }
                 next = getNextPage(uri, response);
             }
-        } catch (RestClientResponseException | NullPointerException e) {
+        } catch (RestClientResponseException|NullPointerException e) {
             throw new CommentNotFoundException();
         }
         return out;
     }
 
-    public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
+    public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments, Boolean test) throws CommentNotFoundException, OAuthException {
         List<Comment> out = new ArrayList<>();
 
         String next = null;
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<CommentSearch> request = new HttpEntity<CommentSearch>(headers);
+        HttpHeaders headers = null;
 
+        if (!test) {
+            headers = authenticator.getAuthHeader();
+        }
+        HttpEntity<CommentSearch> request = new HttpEntity<CommentSearch>(headers);
         ResponseEntity<CommentSearch> response = null;
+
         try {
             response = restTemplate.exchange(
-                    genVideoURI(videoId, maxComments),
+                    genVideoURI(videoId, maxComments, test),
                     HttpMethod.GET,
                     request,
                     CommentSearch.class
@@ -109,15 +131,15 @@ public class CommentService {
             if (response != null && response.getBody() != null) {
                 out.addAll(response.getBody().getItems());
             }
-            next = getNextPage(genVideoURI(videoId, (maxComments - out.size())), response);
+            next = getNextPage(genVideoURI(videoId, (maxComments - out.size()), test), response);
 
             while (out.size() < maxComments && next != null) {
-                response = restTemplate.exchange(next, HttpMethod.GET, null, CommentSearch.class);
+                response = restTemplate.exchange(next, HttpMethod.GET, request, CommentSearch.class);
 
                 if (response.getBody() != null) {
                     out.addAll(response.getBody().getItems());
                 }
-                next = getNextPage(genVideoURI(videoId, maxComments - out.size()), response);
+                next = getNextPage(genVideoURI(videoId, maxComments - out.size(), test), response);
             }
         } catch (RestClientResponseException | CommentNotFoundException e) {
             throw new CommentNotFoundException();

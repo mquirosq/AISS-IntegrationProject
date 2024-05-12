@@ -1,8 +1,8 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CaptionNotFoundException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,8 +19,8 @@ public class CaptionServiceTests {
     final String videoId = "Ks-_Mh1QhMc";
 
     @Test
-    void getCaptionsPositive() throws CaptionNotFoundException {
-        List<Caption> captions = captionService.getCaptions(videoId);
+    void getCaptionsPositive() throws CaptionNotFoundException, OAuthException {
+        List<Caption> captions = captionService.getCaptions(videoId, true);
         assertFalse(captions.isEmpty(), "Resulting captions list cannot be empty.");
         captions.forEach(x->assertNotNull(x, "Resulting caption cannot be null."));
     }
@@ -29,7 +29,7 @@ public class CaptionServiceTests {
     void getCaptionsNegative() {
         assertThrows(
                 CaptionNotFoundException.class,
-                ()->captionService.getCaptions("foo"),
+                ()->captionService.getCaptions("foo", true),
                 "Negative test should throw CaptionNotFoundException."
         );
     }
