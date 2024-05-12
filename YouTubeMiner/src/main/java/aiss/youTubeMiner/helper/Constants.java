@@ -9,6 +9,6 @@ public class Constants {
     public static final String ytScope = "https://www.googleapis.com/auth/youtube";
     public static final String vmBase = "http://localhost:8080/videominer";
     public static final String oauthBase = "https://accounts.google.com/o/oauth2/v2/auth";
-    public static final String tokenBase = "https://oauth2.googleapis.com/token";
+    public static final String tokenBase = "https://oauth2.googleapis.com";
     public static final String ipBase = "http://localhost:8082";
 }

@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.controller;
 
+import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.oauth2.Authenticator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ public class LoginController {
                     "<body>" +
                         "<h1>YouTubeMiner</h1>" +
                         "<p>Login completed, you may now close this page.</p>" +
+                        "<p>If you wish to log out, <a href=\"" + Constants.ipBase + "/logout\">click here</a>.</p>" +
                     "</body>";
         } else if (error != null) {
             out = "<title>YouTubeMiner</title>" +
@@ -45,5 +47,14 @@ public class LoginController {
     @GetMapping("/login")
     public String loginPage() {
         return authenticator.authRequest();
+    }
+
+    @GetMapping("/logout")
+    public String logoutPage() {
+        return "<title>YouTubeMiner</title>" +
+                "<body>" +
+                    "<h1>YouTubeMiner</h1>" +
+                    "<p>" + authenticator.revokeRequest() + "</p>" +
+                "</body>";
     }
 }
