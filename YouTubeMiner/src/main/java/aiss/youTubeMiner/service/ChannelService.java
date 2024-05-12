@@ -6,7 +6,6 @@ import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.youTubeModel.channel.ChannelSearch;
-import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
