@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Juan C. Alonso
@@ -14,6 +15,7 @@ public class Caption {
 
     @Id
     @JsonProperty("id")
+    @NotNull(message = "Caption must have an id")
     private String id;
 
     @JsonProperty("name")

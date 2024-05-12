@@ -13,6 +13,7 @@ public class Comment {
 
     @Id
     @JsonProperty("id")
+    @NotNull(message = "Comment must have an id")
     private String id;
 
     @JsonProperty("text")

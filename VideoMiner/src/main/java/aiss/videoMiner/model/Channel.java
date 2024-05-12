@@ -17,6 +17,7 @@ public class Channel {
 
     @Id
     @JsonProperty("id")
+    @NotNull(message = "Channel must have an id")
     private String id;
 
     @JsonProperty("name")
@@ -38,6 +39,14 @@ public class Channel {
     private List<Video> videos;
 
     public Channel() {
+        this.videos = new ArrayList<>();
+    }
+
+    public Channel(String id, String name, String description, String createdTime){
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.createdTime = createdTime;
         this.videos = new ArrayList<>();
     }
 
