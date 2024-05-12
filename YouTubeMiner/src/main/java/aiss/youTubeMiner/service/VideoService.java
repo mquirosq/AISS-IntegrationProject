@@ -80,20 +80,6 @@ public class VideoService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VVideo createVideo(String channelId, VideoSnippet video) throws ChannelNotFoundException, VideoMinerConnectionRefusedException {
-        try {
-            String uri = Constants.vmBaseUri + "/channels/" + channelId + "/videos";
-            VVideo vVideo = transformVideo(video);
-            HttpEntity<VVideo> request = new HttpEntity<>(vVideo);
-            ResponseEntity<VVideo> response = restTemplate.exchange(uri, HttpMethod.POST, request, VVideo.class);
-            return response.getBody();
-        } catch(HttpClientErrorException.NotFound e) {
-            throw new ChannelNotFoundException();
-        } catch (ResourceAccessException e) {
-            throw new VideoMinerConnectionRefusedException();
-        }
-    }
-
     public VVideo transformVideo(VideoSnippet video) {
         VVideo out = new VVideo();
         out.setId(video.getId().getVideoId());

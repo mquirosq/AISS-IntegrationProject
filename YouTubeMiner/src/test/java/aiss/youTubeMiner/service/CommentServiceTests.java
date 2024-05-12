@@ -28,63 +28,46 @@ public class CommentServiceTests {
     @Test
     void getCommentPositive() throws CommentNotFoundException {
         Comment comment = commentService.getComment(commentId);
-        assertNotNull(comment);
+        assertNotNull(comment, "Resulting comment cannot be null.");
     }
 
     @Test
-    void getCommentNegative() {assertThrows(CommentNotFoundException.class, ()->commentService.getComment("fighters"));}
-
-    @Test
-    void createComment() throws VideoCommentsNotFoundException, CommentNotFoundException {
-        List<Comment> comments = commentService.getCommentsFromVideo(videoId);
-        List<VComment> commentsRes = comments.stream().map(x -> {
-                    try {
-                        return commentService.createComment(videoId, x);
-                    } catch (VideoMinerConnectionRefusedException | VideoCommentsNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
-
-        assertFalse(commentsRes.isEmpty());
-
-        for (int i = 0; i < commentsRes.size(); i++) {
-            assertNotNull(commentsRes.get(i));
-            assertEquals(commentsRes.get(i).getId(), comments.get(i).getCommentSnippet().getTopLevelComment().getId());
-            assertEquals(commentsRes.get(i).getAuthor().getName(), comments.get(i).getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
-            assertEquals(commentsRes.get(i).getCreatedOn(), comments.get(i).getCommentSnippet().getTopLevelComment().getSnippet().getPublishedAt());
-            assertEquals(commentsRes.get(i).getText(), comments.get(i).getCommentSnippet().getTopLevelComment().getSnippet().getTextOriginal());
-        }
+    void getCommentNegative() {
+        assertThrows(
+                CommentNotFoundException.class,
+                ()->commentService.getComment("fighters"),
+                "Negative test must throw a CommentNotFoundException."
+        );
     }
 
     @Test
     void getCommentsFromVideoPositive() throws VideoCommentsNotFoundException, CommentNotFoundException {
-        List<Comment> comments = commentService.getCommentsFromVideo(videoId);
-        assertFalse(comments.isEmpty());
-        comments.forEach(Assertions::assertNotNull);
+        List<Comment> comments = commentService.getCommentsFromVideo(videoId, 10);
+        assertFalse(comments.isEmpty(), "Resulting comment list must not be empty.");
+        comments.forEach(x->assertNotNull(x, "Resulting comment cannot be null."));
     }
 
     @Test
-    void getCommentsFromVideoNegative() { assertThrows(CommentNotFoundException.class, ()-> commentService.getCommentsFromVideo("everlong"));}
+    void getCommentsFromVideoNegative() {
+        assertThrows(
+                CommentNotFoundException.class,
+                ()->commentService.getCommentsFromVideo("everlong", 10),
+                "Negative test must throw a CommentNotFoundException."
+        );
+    }
 
     @Test
     void getUserPositive() throws CommentNotFoundException {
         VUser user = commentService.getUser(commentId);
-        assertNotNull(user);
+        assertNotNull(user, "Resulting user cannot be null.");
     }
 
     @Test
-    void getUserNegative() { assertThrows(CommentNotFoundException.class, ()-> commentService.getUser("comment"));}
-
-    @Test
-    void createUser() throws CommentNotFoundException {
-        VUser user = null;
-        try {
-            user = commentService.getUser(commentId);
-        } catch (CommentNotFoundException e) {
-            throw new RuntimeException();
-        }
-
-        assertNotNull(user);
+    void getUserNegative() {
+        assertThrows(
+                CommentNotFoundException.class,
+                ()->commentService.getUser("comment"),
+                "Negative test must throw CommentNotFoundException."
+        );
     }
 }

@@ -1,8 +1,6 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.ChannelNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
-import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,23 +18,27 @@ public class ChannelServiceTests {
     @Test
     void getChannelPositive() throws ChannelNotFoundException {
         Channel channel = channelService.getChannel(channelId);
-        assertEquals(channel.getId(), channelId);
+        assertEquals(channel.getId(), channelId, "Resulting channel is not the requested one.");
     }
 
     @Test
     void getChannelNegative() {
-        assertThrows(ChannelNotFoundException.class, ()->channelService.getChannel("foo"));
+        assertThrows(
+                ChannelNotFoundException.class,
+                ()->channelService.getChannel("foo"),
+            "Negative test must throw a ChannelNotFoundException."
+        );
     }
 
     @Test
     void createChannel() throws ChannelNotFoundException, VideoMinerConnectionRefusedException {
         Channel channel = channelService.getChannel(channelId);
-        VChannel channelRes = channelService.createChannel(channel);
+        VChannel channelRes = channelService.createChannel(channelService.transformChannel(channel));
 
-        assertNotNull(channelRes);
-        assertEquals(channelRes.getId(), channel.getId());
-        assertEquals(channelRes.getName(), channel.getSnippet().getTitle());
-        assertEquals(channelRes.getDescription(), channel.getSnippet().getDescription());
-        assertEquals(channelRes.getCreatedTime(), channel.getSnippet().getPublishedAt());
+        assertNotNull(channelRes, "Resulting channel cannot be null.");
+        assertEquals(channelRes.getId(), channel.getId(), "Resulting channel ID does not equal requested one.");
+        assertEquals(channelRes.getName(), channel.getSnippet().getTitle(), "Resulting channel name does not equal requested one.");
+        assertEquals(channelRes.getDescription(), channel.getSnippet().getDescription(), "Requested channel description does not equal requested one.");
+        assertEquals(channelRes.getCreatedTime(), channel.getSnippet().getPublishedAt(), "Requested channel creation time does not equal requested one.");
     }
 }

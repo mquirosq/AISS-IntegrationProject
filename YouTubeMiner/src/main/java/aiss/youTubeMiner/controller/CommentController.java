@@ -36,7 +36,7 @@ public class CommentController {
     })
     @GetMapping("/videos/{videoId}/comments")
     public List<VComment> getCommentsFromVideo(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
-        return commentService.getCommentsFromVideo(videoId).stream().map(x->commentService.transformComment(x)).toList();
+        return commentService.getCommentsFromVideo(videoId, 10).stream().map(x->commentService.transformComment(x)).toList();
     }
 
 }

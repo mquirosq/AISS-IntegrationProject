@@ -5,7 +5,11 @@ import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.service.CaptionService;
 import aiss.youTubeMiner.service.CommentService;
 import aiss.youTubeMiner.service.VideoService;
+import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.videoModel.VChannel;
+import aiss.youTubeMiner.videoModel.VComment;
+import aiss.youTubeMiner.videoModel.VVideo;
+import aiss.youTubeMiner.youTubeModel.caption.Caption;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,9 +19,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import aiss.youTubeMiner.youTubeModel.comment.Comment;
+import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name="Channel", description="Channel management API using YouTube API")
 @RestController
@@ -63,48 +71,29 @@ public class ChannelController {
     public VChannel populateOne(@Parameter(description = "id of the channel to be searched") @PathVariable String channelId,
                                 @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
                                 @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
-            throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException {
+            throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException {
 
         Channel channel = channelService.getChannel(channelId);
-        VChannel out = channelService.createChannel(channel);
+        VChannel vChannel = channelService.transformChannel(channel);
 
-        if (maxVideos > 0) {
-            videoService.getVideos(channelId, maxVideos).forEach(x -> {
-                try {
-                    out.getVideos().add(videoService.createVideo(out.getId(), x));
-                } catch (ChannelNotFoundException|VideoMinerConnectionRefusedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-        if ( maxComments > 0) {
-            out.getVideos().forEach(x -> {
-                try {
-                    commentService.getCommentsFromVideo(x.getId()).forEach(c -> {
-                        try {
-                            x.getComments().add(commentService.createComment(x.getId(), c));
-                        } catch (VideoMinerConnectionRefusedException | VideoCommentsNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                } catch (VideoCommentsNotFoundException | CommentNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-        out.getVideos().forEach( x -> {
-            try {
-                captionService.getCaptions(x.getId()).forEach(c -> {
-                    try {
-                        x.getCaptions().add(captionService.createCaption(x.getId(),c));
-                    } catch (VideoNotFoundException|VideoMinerConnectionRefusedException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            } catch (CaptionNotFoundException e) {
-                throw new RuntimeException(e);
+        List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos);
+        for (VideoSnippet v : videos) {
+            VVideo vVideo = videoService.transformVideo(v);
+            String videoId = v.getId().getVideoId();
+
+            List<Caption> captions = captionService.getCaptions(videoId);
+            for (Caption caption : captions) {
+                VCaption vCaption = captionService.transformCaption(caption);
+                vVideo.getCaptions().add(vCaption);
             }
-        });
-        return out;
+
+            List<Comment> comments = commentService.getCommentsFromVideo(videoId, maxComments);
+            for (Comment comment : comments) {
+                VComment vComment = commentService.transformComment(comment);
+                vVideo.getComments().add(vComment);
+            }
+            vChannel.getVideos().add(vVideo);
+        }
+        return channelService.createChannel(vChannel);
     }
 }

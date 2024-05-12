@@ -22,6 +22,15 @@ public class CommentService {
     @Autowired
     RestTemplate restTemplate;
 
+    private String genVideoURI(String videoId, Integer maxComments) {
+        String uri = Constants.ytBaseUri + "/commentThreads";
+        uri += ("?videoId=" + videoId);
+        uri += ("&part=" + "snippet");
+        uri += ("&maxResults=" + maxComments);
+        uri += ("&key=" + Constants.apiKey);
+        return uri;
+    }
+
     public VUser getUser(String commentsId) throws CommentNotFoundException {
         try {
             Comment cm = getComment(commentsId);
@@ -73,13 +82,10 @@ public class CommentService {
         return out;
     }
 
-    public List<Comment> getCommentsFromVideo(String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
+    public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> out = new ArrayList<>();
 
-        String uri = Constants.ytBaseUri + "/commentThreads";
-        uri += ("?videoId=" + videoId);
-        uri += ("&part=" + "snippet");
-        uri += ("&key=" + Constants.apiKey);
+        String next = null;
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<CommentSearch> request = new HttpEntity<CommentSearch>(headers);
@@ -87,7 +93,7 @@ public class CommentService {
         ResponseEntity<CommentSearch> response = null;
         try {
             response = restTemplate.exchange(
-                    uri,
+                    genVideoURI(videoId, maxComments),
                     HttpMethod.GET,
                     request,
                     CommentSearch.class
@@ -104,19 +110,15 @@ public class CommentService {
             if (response != null && response.getBody() != null) {
                 out.addAll(response.getBody().getItems());
             }
+            next = getNextPage(genVideoURI(videoId, (maxComments - out.size())), response);
 
-            String next = null;
-            if (response != null) {
-                next = getNextPage(uri, response);
-            }
-
-            while (next != null) {
+            while (out.size() < maxComments && next != null) {
                 response = restTemplate.exchange(next, HttpMethod.GET, null, CommentSearch.class);
 
                 if (response.getBody() != null) {
                     out.addAll(response.getBody().getItems());
                 }
-                next = getNextPage(uri, response);
+                next = getNextPage(genVideoURI(videoId, maxComments - out.size()), response);
             }
         } catch (RestClientResponseException | CommentNotFoundException e) {
             throw new CommentNotFoundException();
@@ -139,36 +141,6 @@ public class CommentService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VComment createComment(String videoId, Comment comment) throws VideoMinerConnectionRefusedException, VideoCommentsNotFoundException {
-        try {
-            String uri = Constants.vmBaseUri + "/videos/" + videoId + "/comments";
-            VComment vComment = transformComment(comment);
-            HttpEntity<VComment> request = new HttpEntity<>(vComment);
-            ResponseEntity<VComment> response = restTemplate.exchange(uri, HttpMethod.POST, request, VComment.class);
-            return response.getBody();
-        } catch(HttpClientErrorException.NotFound e) {
-            throw new VideoCommentsNotFoundException();
-        } catch (ResourceAccessException e) {
-            throw new VideoMinerConnectionRefusedException();
-        }
-    }
-    
-    public VUser createUser(String commentId) throws VideoMinerConnectionRefusedException, CommentNotFoundException {
-        try {
-            String uri = Constants.vmBaseUri + "/comments/" + commentId + "/user";
-            VUser vUser = getUser(commentId);
-            HttpEntity<VUser> request = new HttpEntity<>(vUser);
-            ResponseEntity<VUser> response = restTemplate.exchange(uri, HttpMethod.POST, request, VUser.class);
-            return response.getBody();
-        } catch (ResourceAccessException e) {
-            throw new VideoMinerConnectionRefusedException();
-        } catch(HttpClientErrorException.NotFound e) {
-            throw new CommentNotFoundException();
-        } catch (CommentNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public VComment transformComment(Comment comment) {
         VComment out = new VComment();
         VUser aux = transformUser(comment);
@@ -179,7 +151,7 @@ public class CommentService {
         return out;
     }
 
-    public VUser transformUser(Comment comment) {
+    private VUser transformUser(Comment comment) {
         VUser out = new VUser();
         out.setName(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
         out.setPicture_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());
