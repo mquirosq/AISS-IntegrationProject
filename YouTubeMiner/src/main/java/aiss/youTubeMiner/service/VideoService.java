@@ -86,18 +86,14 @@ public class VideoService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VVideo transformVideo(VideoSnippet video) throws CaptionNotFoundException, VideoCommentsNotFoundException, CommentNotFoundException {
+    public VVideo transformVideo(VideoSnippet video){
         VVideo out = new VVideo();
-        List<VCaption> vCaptions = new ArrayList<>();
-        List<VComment> vComments = new ArrayList<>();
-        captionService.getCaptions(video.getId().getVideoId()).forEach(ca -> vCaptions.add(captionService.transformCaption(ca)));
-        commentService.getCommentsFromVideo(video.getId().getVideoId(),10).forEach(co -> vComments.add(commentService.transformComment(co)));
         out.setId(video.getId().getVideoId());
         out.setName(video.getSnippet().getTitle());
         out.setDescription(video.getSnippet().getDescription());
         out.setReleaseTime(video.getSnippet().getPublishedAt());
-        out.setCaptions(vCaptions);
-        out.setComments(vComments);
+        out.setCaptions(new ArrayList<>());
+        out.setComments(new ArrayList<>());
         return out;
     }
 }

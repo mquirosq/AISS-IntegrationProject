@@ -59,21 +59,13 @@ public class ChannelService {
         }
     }
 
-    public VChannel transformChannel(Channel channel) throws VideoNotFoundException {
+    public VChannel transformChannel(Channel channel){
         VChannel out = new VChannel();
-        List<VVideo> vVideos = new ArrayList<>();
-        videoService.getVideos(channel.getId(), 10).forEach(v -> {
-            try {
-                vVideos.add(videoService.transformVideo(v));
-            } catch (CaptionNotFoundException | VideoCommentsNotFoundException | CommentNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        });
         out.setId(channel.getId());
         out.setDescription(channel.getSnippet().getDescription());
         out.setName(channel.getSnippet().getTitle());
         out.setCreatedTime(channel.getSnippet().getPublishedAt());
-        out.setVideos(vVideos);
+        out.setVideos(new ArrayList<>());
         return out;
     }
 }

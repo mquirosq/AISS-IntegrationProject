@@ -35,12 +35,6 @@ public class VideoController {
     @GetMapping("/{channelId}/videos")
     public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer max)
             throws VideoNotFoundException {
-        return videoService.getVideos(channelId, (max == null) ? 10 : max).stream().map(x-> {
-            try {
-                return videoService.transformVideo(x);
-            } catch (CaptionNotFoundException | VideoCommentsNotFoundException | CommentNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
+        return videoService.getVideos(channelId, (max == null) ? 10 : max).stream().map(video-> videoService.transformVideo(video)).toList();
     }
 }
