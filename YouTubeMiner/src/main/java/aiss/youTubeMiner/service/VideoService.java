@@ -23,25 +23,32 @@ public class VideoService {
     @Autowired
     Authenticator authenticator;
 
-    private String genURI(String channelId, Integer maxVideos) {
+    private String genURI(String channelId, Integer maxVideos, Boolean test) {
         String uri = Constants.ytBase + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
         uri += ("&maxResults=" + ((maxVideos > 50) ? 50 : maxVideos));
-        uri += ("&key=" + Constants.apiKey);
+
+        if (test) {
+            uri += ("&key=" + Constants.apiKey);
+        }
         return uri;
     }
 
-    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos) throws VideoNotFoundException, OAuthException {
-        HttpHeaders headers = authenticator.getAuthHeader();
+    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos, Boolean test) throws VideoNotFoundException, OAuthException {
+        HttpHeaders headers = null;
+        if (!test) {
+            headers = authenticator.getAuthHeader();
+        }
         HttpEntity<VideoSnippetSearch> request = new HttpEntity<>(headers);
 
         try {
             List<VideoSnippet> out = null;
             String next = null;
+
             ResponseEntity<VideoSnippetSearch> response = restTemplate.exchange(
-                    genURI(channelId, maxVideos),
+                    genURI(channelId, maxVideos, test),
                     HttpMethod.GET,
                     request,
                     VideoSnippetSearch.class
@@ -52,7 +59,7 @@ public class VideoService {
             } else {
                 return null;
             }
-            next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
+            next = getNextPage(genURI(channelId, maxVideos - out.size(), test), response);
 
             while (out.size() < maxVideos && next != null) {
                 response = restTemplate.exchange(next, HttpMethod.GET, request, VideoSnippetSearch.class);
@@ -60,10 +67,10 @@ public class VideoService {
                 if (response.getBody() != null) {
                     out.addAll(response.getBody().getItems());
                 }
-                next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
+                next = getNextPage(genURI(channelId, maxVideos - out.size(), test), response);
             }
             return out;
-        } catch (HttpClientErrorException.NotFound e) {
+        } catch (HttpClientErrorException e) {
             throw new VideoNotFoundException();
         }
     }

@@ -26,13 +26,18 @@ public class CaptionService {
     @Autowired
     Authenticator authenticator;
 
-    public List<Caption> getCaptions(String videoId) throws CaptionNotFoundException, OAuthException {
+    public List<Caption> getCaptions(String videoId, Boolean test) throws CaptionNotFoundException, OAuthException {
         String uri = Constants.ytBase + "/captions";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + Constants.apiKey);
 
-        HttpHeaders headers = authenticator.getAuthHeader();
+        HttpHeaders headers = null;
+
+        if (test) {
+            uri += ("&key=" + Constants.apiKey);
+        } else {
+            headers = authenticator.getAuthHeader();
+        }
 
         try {
             ResponseEntity<CaptionSearch> response = restTemplate.exchange(

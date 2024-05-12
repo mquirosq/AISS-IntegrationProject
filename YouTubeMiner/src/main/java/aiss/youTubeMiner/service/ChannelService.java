@@ -28,12 +28,18 @@ public class ChannelService {
     @Autowired
     public Authenticator authenticator;
 
-    public Channel getChannel(String channelId) throws ChannelNotFoundException, OAuthException {
+    public Channel getChannel(String channelId, Boolean test) throws ChannelNotFoundException, OAuthException {
         String uri = Constants.ytBase + "/channels";
         uri += ("?id=" + channelId);
         uri += ("&part=" + "snippet");
 
-        HttpHeaders header = authenticator.getAuthHeader();
+        HttpHeaders header = null;
+
+        if (test) {
+            uri += ("&key=" + Constants.apiKey);
+        } else {
+            header = authenticator.getAuthHeader();
+        }
 
         try {
             ResponseEntity<ChannelSearch> response = restTemplate.exchange(

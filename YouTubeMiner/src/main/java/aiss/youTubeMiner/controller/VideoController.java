@@ -36,6 +36,6 @@ public class VideoController {
     @GetMapping("/{channelId}/videos")
     public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer max)
             throws VideoNotFoundException, OAuthException {
-        return videoService.getVideos(channelId, (max == null) ? 10 : max).stream().map(x->videoService.transformVideo(x)).toList();
+        return videoService.getVideos(channelId, (max == null) ? 10 : max, false).stream().map(x->videoService.transformVideo(x)).toList();
     }
 }

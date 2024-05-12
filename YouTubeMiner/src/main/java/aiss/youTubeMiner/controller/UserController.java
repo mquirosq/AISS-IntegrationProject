@@ -35,6 +35,6 @@ public class UserController {
     })
     @GetMapping("/comments/{commentId}/user")
     public VUser getUser(@Parameter(description = "id of the comment from which the user the author of") @PathVariable String commentId) throws CommentNotFoundException, OAuthException {
-        return commentService.getUser(commentId);
+        return commentService.getUser(commentId, false);
     }
 }

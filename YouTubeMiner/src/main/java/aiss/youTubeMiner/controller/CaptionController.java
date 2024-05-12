@@ -40,7 +40,7 @@ public class CaptionController {
     })
     @GetMapping("/{videoId}/captions")
     public List<VCaption> findAll(@Parameter(description = "id of the video to which the captions belong") @PathVariable String videoId) throws CaptionNotFoundException, OAuthException {
-        List<Caption> captions = captionService.getCaptions(videoId);
+        List<Caption> captions = captionService.getCaptions(videoId, false);
         List<VCaption> vCaptions = new ArrayList<>();
         for (Caption caption : captions){
             vCaptions.add(captionService.transformCaption(caption));

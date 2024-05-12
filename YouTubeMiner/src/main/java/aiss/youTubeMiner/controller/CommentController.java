@@ -40,12 +40,12 @@ public class CommentController {
     })
     @GetMapping("/videos/{videoId}/comments")
     public List<VComment> getCommentsFromVideo(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException, OAuthException {
-        return commentService.getCommentsFromVideo(videoId, 10).stream().map(x->commentService.transformComment(x)).toList();
+        return commentService.getCommentsFromVideo(videoId, 10, false).stream().map(x->commentService.transformComment(x)).toList();
     }
 
     @GetMapping("/comments/{commentId}")
     public VComment getComment(@PathVariable String commentId) throws CommentNotFoundException, OAuthException {
-        return commentService.transformComment(commentService.getComment(commentId));
+        return commentService.transformComment(commentService.getComment(commentId, false));
     }
 
 }

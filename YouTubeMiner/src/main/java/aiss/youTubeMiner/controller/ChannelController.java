@@ -52,7 +52,7 @@ public class ChannelController {
     })
     @GetMapping("{channelId}")
     public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException, OAuthException {
-        return channelService.getChannel(channelId);
+        return channelService.getChannel(channelId, false);
     }
 
     @Operation(
@@ -72,21 +72,21 @@ public class ChannelController {
                                 @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
             throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException, OAuthException {
 
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannel(channelId, false);
         VChannel vChannel = channelService.transformChannel(channel);
 
-        List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos);
+        List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos, false);
         for (VideoSnippet v : videos) {
             VVideo vVideo = videoService.transformVideo(v);
             String videoId = v.getId().getVideoId();
 
-            List<Caption> captions = captionService.getCaptions(videoId);
+            List<Caption> captions = captionService.getCaptions(videoId, false);
             for (Caption caption : captions) {
                 VCaption vCaption = captionService.transformCaption(caption);
                 vVideo.getCaptions().add(vCaption);
             }
 
-            List<Comment> comments = commentService.getCommentsFromVideo(videoId, maxComments);
+            List<Comment> comments = commentService.getCommentsFromVideo(videoId, maxComments, false);
             for (Comment comment : comments) {
                 VComment vComment = commentService.transformComment(comment);
                 vVideo.getComments().add(vComment);

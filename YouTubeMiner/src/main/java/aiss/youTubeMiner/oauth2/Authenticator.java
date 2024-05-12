@@ -53,6 +53,12 @@ public class Authenticator {
 
     public String revokeRequest() {
         String out = "";
+
+        if (token == null) {
+            out = "User is already logged out.";
+            System.out.println("\n" + out + "\n");
+            return out;
+        }
         String uri = Constants.tokenBase + "/revoke";
                 uri += ("?token=" + token.getAccessToken());
         ResponseEntity<String> response = null;
