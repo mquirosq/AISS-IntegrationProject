@@ -10,19 +10,16 @@ import java.util.Map;
 @JsonPropertyOrder({
     "access_token",
     "expires_in",
-    "refresh_token",
     "scope",
     "token_type"
 })
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccessToken {
+public class RefreshToken {
     @JsonProperty("access_token")
     private String accessToken;
     @JsonProperty("expires_in")
     private Integer expiresIn;
-    @JsonProperty("refresh_token")
-    private String refreshToken;
     @JsonProperty("scope")
     private String scope;
     @JsonProperty("token_type")
@@ -48,16 +45,6 @@ public class AccessToken {
     @JsonProperty("expires_in")
     public void setExpiresIn(Integer expiresIn) {
         this.expiresIn = expiresIn;
-    }
-
-    @JsonProperty("refresh_token")
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    @JsonProperty("refresh_token")
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     @JsonProperty("scope")
@@ -93,7 +80,7 @@ public class AccessToken {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(AccessToken.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(RefreshToken.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("accessToken");
         sb.append('=');
         sb.append(((this.accessToken == null)?"<null>":this.accessToken));
@@ -101,10 +88,6 @@ public class AccessToken {
         sb.append("expiresIn");
         sb.append('=');
         sb.append(((this.expiresIn == null)?"<null>":this.expiresIn));
-        sb.append(',');
-        sb.append("refreshToken");
-        sb.append('=');
-        sb.append(((this.refreshToken == null)?"<null>":this.refreshToken));
         sb.append(',');
         sb.append("scope");
         sb.append('=');
@@ -130,11 +113,10 @@ public class AccessToken {
     public int hashCode() {
         int result = 1;
         result = ((result* 31)+((this.expiresIn == null)? 0 :this.expiresIn.hashCode()));
-        result = ((result* 31)+((this.scope == null)? 0 :this.scope.hashCode()));
         result = ((result* 31)+((this.additionalProperties == null)? 0 :this.additionalProperties.hashCode()));
         result = ((result* 31)+((this.accessToken == null)? 0 :this.accessToken.hashCode()));
         result = ((result* 31)+((this.tokenType == null)? 0 :this.tokenType.hashCode()));
-        result = ((result* 31)+((this.refreshToken == null)? 0 :this.refreshToken.hashCode()));
+        result = ((result* 31)+((this.scope == null)? 0 :this.scope.hashCode()));
         return result;
     }
 
@@ -143,11 +125,11 @@ public class AccessToken {
         if (other == this) {
             return true;
         }
-        if ((other instanceof AccessToken) == false) {
+        if ((other instanceof RefreshToken) == false) {
             return false;
         }
-        AccessToken rhs = ((AccessToken) other);
-        return (((((((this.expiresIn == rhs.expiresIn)||((this.expiresIn!= null)&&this.expiresIn.equals(rhs.expiresIn)))&&((this.scope == rhs.scope)||((this.scope!= null)&&this.scope.equals(rhs.scope))))&&((this.additionalProperties == rhs.additionalProperties)||((this.additionalProperties!= null)&&this.additionalProperties.equals(rhs.additionalProperties))))&&((this.accessToken == rhs.accessToken)||((this.accessToken!= null)&&this.accessToken.equals(rhs.accessToken))))&&((this.tokenType == rhs.tokenType)||((this.tokenType!= null)&&this.tokenType.equals(rhs.tokenType))))&&((this.refreshToken == rhs.refreshToken)||((this.refreshToken!= null)&&this.refreshToken.equals(rhs.refreshToken))));
+        RefreshToken rhs = ((RefreshToken) other);
+        return ((((((this.expiresIn == rhs.expiresIn)||((this.expiresIn!= null)&&this.expiresIn.equals(rhs.expiresIn)))&&((this.additionalProperties == rhs.additionalProperties)||((this.additionalProperties!= null)&&this.additionalProperties.equals(rhs.additionalProperties))))&&((this.accessToken == rhs.accessToken)||((this.accessToken!= null)&&this.accessToken.equals(rhs.accessToken))))&&((this.tokenType == rhs.tokenType)||((this.tokenType!= null)&&this.tokenType.equals(rhs.tokenType))))&&((this.scope == rhs.scope)||((this.scope!= null)&&this.scope.equals(rhs.scope))));
     }
 
 }
