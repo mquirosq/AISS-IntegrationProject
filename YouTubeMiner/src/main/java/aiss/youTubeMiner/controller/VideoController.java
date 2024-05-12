@@ -1,11 +1,16 @@
 package aiss.youTubeMiner.controller;
 
-import aiss.youTubeMiner.exception.OAuthException;
-import aiss.youTubeMiner.exception.VideoNotFoundException;
+import aiss.youTubeMiner.exception.*;
 import aiss.youTubeMiner.helper.ConstantsHelper;
+import aiss.youTubeMiner.service.CaptionService;
+import aiss.youTubeMiner.service.CommentService;
+import aiss.youTubeMiner.videoModel.VCaption;
+import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.service.VideoService;
-import aiss.youTubeMiner.videoModel.VVideo;
+import aiss.youTubeMiner.youTubeModel.caption.Caption;
+import aiss.youTubeMiner.youTubeModel.comment.Comment;
+import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name="Video", description="Video management API using YouTube API")
@@ -24,6 +30,10 @@ import java.util.List;
 public class VideoController {
     @Autowired
     VideoService videoService;
+    @Autowired
+    CaptionService captionService;
+    @Autowired
+    CommentService commentService;
 
     @Operation(
             summary="Retrieve Videos from channel",
@@ -35,8 +45,16 @@ public class VideoController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/{channelId}/videos")
-    public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer maxVideos)
-            throws VideoNotFoundException, OAuthException {
-        return videoService.getVideos(channelId, (maxVideos == null) ? 10 : maxVideos, false).stream().map(video-> videoService.transformVideo(video)).toList();
+    public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId,
+                                @RequestParam(required = false) Integer maxVideos,
+                                @Parameter(description = "maximum number of comments that will be retrieved for each video") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
+            throws VideoNotFoundException, OAuthException, CaptionNotFoundException, VideoCommentsNotFoundException, CommentNotFoundException {
+        List<VideoSnippet> videos = videoService.getVideos(channelId, (maxVideos == null) ? 10 : maxVideos, false);
+        List<VVideo> vVideos = new ArrayList<>();
+        for (VideoSnippet video : videos){
+            VVideo vVideo = videoService.populateVVideo(video, maxComments);
+            vVideos.add(vVideo);
+        }
+        return vVideos;
     }
 }

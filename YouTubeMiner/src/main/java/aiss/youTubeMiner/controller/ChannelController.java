@@ -41,7 +41,6 @@ public class ChannelController {
     @Autowired
     CaptionService captionService;
 
-
     @Operation(
             summary="Retrieve a Channel by Id",
             description = "Get a Channel object given by its id from YouTube",
@@ -52,8 +51,21 @@ public class ChannelController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("{channelId}")
-    public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException, OAuthException {
-        return channelService.getChannel(channelId, false);
+    public VChannel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId,
+                           @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
+                           @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
+            throws ChannelNotFoundException, OAuthException, VideoNotFoundException, CaptionNotFoundException, VideoCommentsNotFoundException, CommentNotFoundException {
+
+        Channel channel = channelService.getChannel(channelId, false);
+        VChannel vChannel = channelService.transformChannel(channel);
+
+        List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos, false);
+        for (VideoSnippet v : videos) {
+            VVideo vVideo = videoService.populateVVideo(v, maxComments);
+            vChannel.getVideos().add(vVideo);
+        }
+
+        return vChannel;
     }
 
     @Operation(
@@ -78,20 +90,7 @@ public class ChannelController {
 
         List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos, false);
         for (VideoSnippet v : videos) {
-            VVideo vVideo = videoService.transformVideo(v);
-            String videoId = v.getId().getVideoId();
-
-            List<Caption> captions = captionService.getCaptions(videoId, false);
-            for (Caption caption : captions) {
-                VCaption vCaption = captionService.transformCaption(caption);
-                vVideo.getCaptions().add(vCaption);
-            }
-
-            List<Comment> comments = commentService.getComments(videoId, maxComments, false);
-            for (Comment comment : comments) {
-                VComment vComment = commentService.transformComment(comment);
-                vVideo.getComments().add(vComment);
-            }
+            VVideo vVideo = videoService.populateVVideo(v, maxComments);
             vChannel.getVideos().add(vVideo);
         }
         return channelService.createChannel(vChannel);

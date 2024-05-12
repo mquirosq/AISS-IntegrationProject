@@ -3,7 +3,11 @@ package aiss.youTubeMiner.service;
 import aiss.youTubeMiner.exception.*;
 import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.oauth2.Authenticator;
+import aiss.youTubeMiner.videoModel.VCaption;
+import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VVideo;
+import aiss.youTubeMiner.youTubeModel.caption.Caption;
+import aiss.youTubeMiner.youTubeModel.comment.Comment;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,5 +104,23 @@ public class VideoService {
         out.setCaptions(new ArrayList<>());
         out.setComments(new ArrayList<>());
         return out;
+    }
+
+    public VVideo populateVVideo(VideoSnippet video, Integer maxComments) throws OAuthException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException {
+        VVideo vVideo = transformVideo(video);
+        String videoId = video.getId().getVideoId();
+
+        List<Caption> captions = captionService.getCaptions(videoId, false);
+        for (Caption caption : captions) {
+            VCaption vCaption = captionService.transformCaption(caption);
+            vVideo.getCaptions().add(vCaption);
+        }
+
+        List<Comment> comments = commentService.getComments(videoId, maxComments, false);
+        for (Comment comment : comments) {
+            VComment vComment = commentService.transformComment(comment);
+            vVideo.getComments().add(vComment);
+        }
+        return vVideo;
     }
 }
