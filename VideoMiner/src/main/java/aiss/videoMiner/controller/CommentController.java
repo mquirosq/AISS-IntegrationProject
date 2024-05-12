@@ -1,8 +1,6 @@
 package aiss.videoMiner.controller;
 
-import aiss.videoMiner.exception.CommentNotFoundException;
-import aiss.videoMiner.exception.UserNotFoundException;
-import aiss.videoMiner.exception.VideoNotFoundException;
+import aiss.videoMiner.exception.*;
 import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.User;
@@ -19,6 +17,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +29,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
+import static aiss.videoMiner.helper.PaginationHelper.getCaptionPage;
+import static aiss.videoMiner.helper.PaginationHelper.getCommentPage;
 
 @Tag(name="Comment", description="Comment management API")
 @RestController
@@ -45,11 +50,42 @@ public class CommentController {
             summary="Retrieve all Comments",
             description = "Get a list of Comment objects including all the comments in the VideoMiner database",
             tags= {"comments", "get", "all"})
-    @ApiResponse(responseCode = "200", content = {@Content(schema=
-    @Schema(implementation= Comment.class), mediaType="application/json")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema=
+            @Schema(implementation= Comment.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())})
+    })
     @GetMapping("/comments")
-    public List<Comment> findAll() {
-        return commentRepository.findAll();
+    public List<Comment> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                                 @Parameter(description = "maximum number of comments per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                 @Parameter(description = "string contained in the text of the comment") @RequestParam(name="text", required = false) String text,
+                                 @Parameter(description = "takes as value one of the properties of the comment and orders the comments by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
+            throws OrderByPropertyDoesNotExistCommentException {
+        Pageable paging;
+
+        if (orderBy != null){
+            if (orderBy.startsWith("-")){
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+            }
+            else {
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
+            }
+        }
+        else
+            paging = PageRequest.of(offset, limit);
+
+        Page<Comment> pageComments;
+
+        try{
+            if (text != null)
+                pageComments = commentRepository.findByTextContaining(text, paging);
+            else
+                pageComments = commentRepository.findAll(paging);
+        }
+        catch(PropertyReferenceException err){
+            throw new OrderByPropertyDoesNotExistCommentException();
+        }
+        return pageComments.getContent();
     }
 
     @Operation(
@@ -76,9 +112,21 @@ public class CommentController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/videos/{videoId}/comments")
-    public List<Comment> findByVideo(@Parameter(description = "id of the video from which to retrieve the comments") @PathVariable String videoId) throws VideoNotFoundException {
-        return videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new).getComments();
-    }
+    public List<Comment> findByVideo(@Parameter(description = "id of the video from which to retrieve the comments") @PathVariable String videoId,
+                                     @Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                                     @Parameter(description = "maximum number of comments per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                     @Parameter(description = "string contained in the text of the comment") @RequestParam(name="text", required = false) String text,
+                                     @Parameter(description = "takes as value one of the properties of the comment and orders the comments by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
+            throws OrderByPropertyDoesNotExistCommentException, VideoNotFoundException {
+        List<Comment> comments =  videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new).getComments();
+
+        if (text != null){
+            comments = comments.stream().filter(comment -> comment.getText().contains(text)).toList();
+        }
+
+        Page<Comment> pageCaption = getCommentPage(offset, limit, comments, orderBy);
+        return pageCaption.getContent();
+      }
 
     @Operation(
             summary="Insert a Comment in a video",
