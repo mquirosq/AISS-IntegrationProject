@@ -1,7 +1,10 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.CommentNotFoundException;
+import aiss.videoMiner.exception.OrderByPropertyDoesNotExistCaptionException;
+import aiss.videoMiner.exception.OrderByPropertyDoesNotExistUserException;
 import aiss.videoMiner.exception.UserNotFoundException;
+import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.User;
 import aiss.videoMiner.repository.CommentRepository;
@@ -15,6 +18,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,11 +47,43 @@ public class UserController {
             summary="Retrieve all Users",
             description = "Get a list of User objects including all the users in the VideoMiner database",
             tags= {"users", "get", "all"})
-    @ApiResponse(responseCode = "200", content = {@Content(schema=
-        @Schema(implementation= User.class), mediaType="application/json")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema=
+            @Schema(implementation= User.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())})
+    })
     @GetMapping("/users")
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<User> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                              @Parameter(description = "maximum number of users per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                              @Parameter(description = "string corresponding to the name of the user") @RequestParam(name="name", required = false) String name,
+                              @Parameter(description = "takes as value one of the properties of the user and orders the users by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
+            throws OrderByPropertyDoesNotExistUserException {
+
+        Pageable paging;
+
+        if (orderBy != null){
+            if (orderBy.startsWith("-")){
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+            }
+            else {
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
+            }
+        }
+        else
+            paging = PageRequest.of(offset, limit);
+
+        Page<User> pageCaptions;
+
+        try{
+            if (name != null)
+                pageCaptions = userRepository.findByNameContaining(name, paging);
+            else
+                pageCaptions = userRepository.findAll(paging);
+        }
+        catch(PropertyReferenceException err){
+            throw new OrderByPropertyDoesNotExistUserException();
+        }
+        return pageCaptions.getContent();
     }
 
 
