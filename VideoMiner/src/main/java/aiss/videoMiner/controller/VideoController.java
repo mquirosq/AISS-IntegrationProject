@@ -1,9 +1,6 @@
 package aiss.videoMiner.controller;
 
-import aiss.videoMiner.exception.ChannelNotFoundException;
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistChannelException;
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistVideoException;
-import aiss.videoMiner.exception.VideoNotFoundException;
+import aiss.videoMiner.exception.*;
 import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.model.Video;
@@ -114,7 +111,7 @@ public class VideoController {
                                      @Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
                                      @Parameter(description = "maximum number of videos per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                                      @Parameter(description = "string that must be included in the name of the video") @RequestParam(name="name", required = false) String name,
-                                     @Parameter(description = "takes as value one of the properties of the video and orders the videos by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws ChannelNotFoundException, OrderByPropertyDoesNotExistVideoException {
+                                     @Parameter(description = "takes as value one of the properties of the video and orders the videos by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws ChannelNotFoundException, OrderByPropertyDoesNotExistVideoException, InvalidPageParametersException {
 
         List<Video> videos =  channelRepository.findById(channelId).orElseThrow(ChannelNotFoundException::new).getVideos();
 

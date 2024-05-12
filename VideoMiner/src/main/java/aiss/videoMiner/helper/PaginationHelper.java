@@ -1,9 +1,6 @@
 package aiss.videoMiner.helper;
 
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistCaptionException;
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistCommentException;
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistUserException;
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistVideoException;
+import aiss.videoMiner.exception.*;
 import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.User;
@@ -19,7 +16,11 @@ import java.util.List;
 
 public class PaginationHelper {
 
-    public static Page<Video> getVideoPage(int offset, int limit, List<Video> videos, String orderBy) throws OrderByPropertyDoesNotExistVideoException {
+    public static Page<Video> getVideoPage(int offset, int limit, List<Video> videos, String orderBy) throws OrderByPropertyDoesNotExistVideoException, InvalidPageParametersException {
+
+        if (limit <= 0 || offset < 0){
+            throw new InvalidPageParametersException();
+        }
 
         Pageable pageRequest = PageRequest.of(offset, limit);
 
@@ -55,7 +56,11 @@ public class PaginationHelper {
     }
 
 
-    public static Page<Caption> getCaptionPage(int offset, int limit, List<Caption> captions, String orderBy) throws OrderByPropertyDoesNotExistCaptionException {
+    public static Page<Caption> getCaptionPage(int offset, int limit, List<Caption> captions, String orderBy) throws OrderByPropertyDoesNotExistCaptionException, InvalidPageParametersException {
+
+        if (limit <= 0 || offset < 0){
+            throw new InvalidPageParametersException();
+        }
 
         Pageable pageRequest = PageRequest.of(offset, limit);
 
@@ -87,7 +92,11 @@ public class PaginationHelper {
         return comparator;
     }
 
-    public static Page<Comment> getCommentPage(int offset, int limit, List<Comment> comments, String orderBy) throws OrderByPropertyDoesNotExistCommentException {
+    public static Page<Comment> getCommentPage(int offset, int limit, List<Comment> comments, String orderBy) throws OrderByPropertyDoesNotExistCommentException, InvalidPageParametersException {
+
+        if (limit <= 0 || offset < 0){
+            throw new InvalidPageParametersException();
+        }
 
         Pageable pageRequest = PageRequest.of(offset, limit);
 
@@ -113,40 +122,6 @@ public class PaginationHelper {
             case "createdOn" -> Comparator.comparing(Comment::getCreatedOn);
             case "author" -> Comparator.comparing(comment -> comment.getAuthor().getName());
             default -> throw new OrderByPropertyDoesNotExistCommentException();
-        };
-
-        if (orderBy.startsWith("-")){
-            comparator = comparator.reversed();
-        }
-        return comparator;
-    }
-
-    public static Page<User> getUserPage(int offset, int limit, List<User> users, String orderBy) throws OrderByPropertyDoesNotExistUserException {
-
-        Pageable pageRequest = PageRequest.of(offset, limit);
-
-        int start = (int) pageRequest.getOffset();
-        int end = Math.min((start + pageRequest.getPageSize()), users.size());
-
-        if (orderBy != null){
-            Comparator<User> comparator = getComparatorUser(orderBy);
-            users.sort(comparator);
-        }
-
-        List<User> pageContent = new ArrayList<>();
-        if (start <= end){
-            pageContent = users.subList(start, end);
-        }
-        return new PageImpl<>(pageContent, pageRequest, users.size());
-    }
-
-    private static Comparator<User> getComparatorUser(String orderBy) throws OrderByPropertyDoesNotExistUserException {
-
-        Comparator<User> comparator = switch (orderBy.startsWith("-") ? orderBy.substring(1) : orderBy) {
-            case "name" -> Comparator.comparing(User::getName);
-            case "userLink" -> Comparator.comparing(User::getUserLink);
-            case "pictureLink" -> Comparator.comparing(User::getPictureLink);
-            default -> throw new OrderByPropertyDoesNotExistUserException();
         };
 
         if (orderBy.startsWith("-")){

@@ -109,6 +109,7 @@ public class CommentController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Comment.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/videos/{videoId}/comments")
@@ -117,15 +118,15 @@ public class CommentController {
                                      @Parameter(description = "maximum number of comments per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                                      @Parameter(description = "string contained in the text of the comment") @RequestParam(name="text", required = false) String text,
                                      @Parameter(description = "takes as value one of the properties of the comment and orders the comments by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
-            throws OrderByPropertyDoesNotExistCommentException, VideoNotFoundException {
+            throws OrderByPropertyDoesNotExistCommentException, VideoNotFoundException, InvalidPageParametersException {
         List<Comment> comments =  videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new).getComments();
 
         if (text != null){
             comments = comments.stream().filter(comment -> comment.getText().contains(text)).toList();
         }
 
-        Page<Comment> pageCaption = getCommentPage(offset, limit, comments, orderBy);
-        return pageCaption.getContent();
+        Page<Comment> pageComment = getCommentPage(offset, limit, comments, orderBy);
+        return pageComment.getContent();
       }
 
     @Operation(

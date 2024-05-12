@@ -104,13 +104,14 @@ public class CaptionController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Caption.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/videos/{videoId}/captions")
     public List<Caption> findByVideo(@Parameter(description="id of the video from which to retrieve the captions") @PathVariable String videoId, @Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
                                      @Parameter(description = "maximum number of captions per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                                      @Parameter(description = "string that is the  language of the captions") @RequestParam(name="language", required = false) String language,
-                                     @Parameter(description = "takes as value one of the properties of the caption and orders the captions by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws VideoNotFoundException, OrderByPropertyDoesNotExistCaptionException {
+                                     @Parameter(description = "takes as value one of the properties of the caption and orders the captions by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws VideoNotFoundException, OrderByPropertyDoesNotExistCaptionException, InvalidPageParametersException {
 
         List<Caption> captions =  videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new).getCaptions();
 
