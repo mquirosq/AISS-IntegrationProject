@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.controller;
 
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
@@ -38,7 +39,7 @@ public class CaptionController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/{videoId}/captions")
-    public List<VCaption> findAll(@Parameter(description = "id of the video to which the captions belong") @PathVariable String videoId) throws CaptionNotFoundException {
+    public List<VCaption> findAll(@Parameter(description = "id of the video to which the captions belong") @PathVariable String videoId) throws CaptionNotFoundException, OAuthException {
         List<Caption> captions = captionService.getCaptions(videoId);
         List<VCaption> vCaptions = new ArrayList<>();
         for (Caption caption : captions){

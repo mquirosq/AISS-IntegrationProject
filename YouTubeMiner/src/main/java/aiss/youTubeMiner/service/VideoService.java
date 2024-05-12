@@ -1,9 +1,9 @@
 package aiss.youTubeMiner.service;
 
-import aiss.youTubeMiner.exception.ChannelNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
@@ -20,6 +20,9 @@ public class VideoService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    Authenticator authenticator;
+
     private String genURI(String channelId, Integer maxVideos) {
         String uri = Constants.ytBase + "/search";
         uri += ("?channelId=" + channelId);
@@ -30,8 +33,8 @@ public class VideoService {
         return uri;
     }
 
-    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos) throws VideoNotFoundException {
-        HttpHeaders headers = new HttpHeaders();
+    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos) throws VideoNotFoundException, OAuthException {
+        HttpHeaders headers = authenticator.getAuthHeader();
         HttpEntity<VideoSnippetSearch> request = new HttpEntity<>(headers);
 
         try {

@@ -35,10 +35,6 @@ public class ChannelService {
 
         HttpHeaders header = authenticator.getAuthHeader();
 
-        if (header == null) {
-            throw new OAuthException();
-        }
-
         try {
             ResponseEntity<ChannelSearch> response = restTemplate.exchange(
                     uri,

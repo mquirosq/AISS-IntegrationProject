@@ -1,16 +1,22 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
-import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VUser;
-import aiss.youTubeMiner.youTubeModel.comment.*;
+import aiss.youTubeMiner.youTubeModel.comment.Comment;
+import aiss.youTubeMiner.youTubeModel.comment.CommentSearch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.*;
-import org.springframework.http.*;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +28,9 @@ public class CommentService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    Authenticator authenticator;
+
     private String genVideoURI(String videoId, Integer maxComments) {
         String uri = Constants.ytBase + "/commentThreads";
         uri += ("?videoId=" + videoId);
@@ -31,7 +40,7 @@ public class CommentService {
         return uri;
     }
 
-    public VUser getUser(String commentsId) throws CommentNotFoundException {
+    public VUser getUser(String commentsId) throws CommentNotFoundException, OAuthException {
         try {
             Comment cm = getComment(commentsId);
             return transformUser(cm);
@@ -40,7 +49,7 @@ public class CommentService {
         }
     }
 
-    public Comment getComment(String commentsId) throws CommentNotFoundException {
+    public Comment getComment(String commentsId) throws CommentNotFoundException, OAuthException {
         List<Comment> aux = new ArrayList<>();
         Comment out = new Comment();
 
@@ -49,7 +58,7 @@ public class CommentService {
         uri += ("&part=" + "snippet");
         uri += ("&key=" + Constants.apiKey);
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = authenticator.getAuthHeader();
         HttpEntity<CommentSearch> request = new HttpEntity<>(headers);
 
         ResponseEntity<CommentSearch> response = restTemplate.exchange(
@@ -82,11 +91,11 @@ public class CommentService {
         return out;
     }
 
-    public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
+    public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments) throws CommentNotFoundException, OAuthException {
         List<Comment> out = new ArrayList<>();
         String next = null;
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = authenticator.getAuthHeader();
         HttpEntity<CommentSearch> request = new HttpEntity<CommentSearch>(headers);
 
         ResponseEntity<CommentSearch> response = null;

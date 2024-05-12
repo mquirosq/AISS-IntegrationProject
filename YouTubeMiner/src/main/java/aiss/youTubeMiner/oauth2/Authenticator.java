@@ -1,5 +1,6 @@
 package aiss.youTubeMiner.oauth2;
 
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.oAuthModel.AccessToken;
 import aiss.youTubeMiner.oAuthModel.RefreshToken;
@@ -85,7 +86,7 @@ public class Authenticator {
         return token;
     }
 
-    public HttpHeaders getAuthHeader() {
+    public HttpHeaders getAuthHeader() throws OAuthException {
         HttpHeaders out = null;
 
         if (token != null) {
@@ -97,6 +98,8 @@ public class Authenticator {
                     set("Authorization", "Bearer " + token.getAccessToken());
                 }
             };
+        } else {
+            throw new OAuthException();
         }
         return out;
     }

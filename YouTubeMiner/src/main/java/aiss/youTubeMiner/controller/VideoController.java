@@ -1,20 +1,17 @@
 package aiss.youTubeMiner.controller;
 
-import aiss.youTubeMiner.exception.ChannelNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.helper.Constants;
-import aiss.youTubeMiner.videoModel.VCaption;
-import aiss.youTubeMiner.videoModel.VVideo;
-import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.service.VideoService;
+import aiss.youTubeMiner.videoModel.VVideo;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +35,7 @@ public class VideoController {
     })
     @GetMapping("/{channelId}/videos")
     public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer max)
-            throws VideoNotFoundException {
+            throws VideoNotFoundException, OAuthException {
         return videoService.getVideos(channelId, (max == null) ? 10 : max).stream().map(x->videoService.transformVideo(x)).toList();
     }
 }
