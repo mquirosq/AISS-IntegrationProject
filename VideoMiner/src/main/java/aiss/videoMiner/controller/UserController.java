@@ -1,9 +1,6 @@
 package aiss.videoMiner.controller;
 
-import aiss.videoMiner.exception.CommentNotFoundException;
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistCaptionException;
-import aiss.videoMiner.exception.OrderByPropertyDoesNotExistUserException;
-import aiss.videoMiner.exception.UserNotFoundException;
+import aiss.videoMiner.exception.*;
 import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.User;
@@ -57,7 +54,11 @@ public class UserController {
                               @Parameter(description = "maximum number of users per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                               @Parameter(description = "string corresponding to the name of the user") @RequestParam(name="name", required = false) String name,
                               @Parameter(description = "takes as value one of the properties of the user and orders the users by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
-            throws OrderByPropertyDoesNotExistUserException {
+            throws OrderByPropertyDoesNotExistUserException, InvalidPageParametersException {
+
+        if (limit <= 0 || offset < 0){
+            throw new InvalidPageParametersException();
+        }
 
         Pageable paging;
 

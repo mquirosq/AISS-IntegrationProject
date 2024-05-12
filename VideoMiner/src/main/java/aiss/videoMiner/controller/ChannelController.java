@@ -1,6 +1,7 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.ChannelNotFoundException;
+import aiss.videoMiner.exception.InvalidPageParametersException;
 import aiss.videoMiner.exception.OrderByPropertyDoesNotExistChannelException;
 import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.model.Video;
@@ -48,7 +49,11 @@ public class ChannelController {
                                  @Parameter(description = "maximum number of channels per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                                  @Parameter(description = "string that must be included in the name of the channel") @RequestParam(name="name", required = false) String name,
                                  @Parameter(description = "takes as value one of the properties of the channel and orders the channels by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
-            throws OrderByPropertyDoesNotExistChannelException {
+            throws OrderByPropertyDoesNotExistChannelException, InvalidPageParametersException {
+
+        if (limit <= 0 || offset < 0){
+            throw new InvalidPageParametersException();
+        }
 
         Pageable paging;
 

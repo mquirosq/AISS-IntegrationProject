@@ -2,7 +2,6 @@ package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.*;
 import aiss.videoMiner.model.Caption;
-import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.model.Video;
 import aiss.videoMiner.repository.CaptionRepository;
 import aiss.videoMiner.repository.VideoRepository;
@@ -28,7 +27,6 @@ import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
 import static aiss.videoMiner.helper.PaginationHelper.getCaptionPage;
-import static aiss.videoMiner.helper.PaginationHelper.getVideoPage;
 
 @Tag(name="Caption", description="Caption management API")
 @RestController
@@ -54,7 +52,11 @@ public class CaptionController {
                                  @Parameter(description = "maximum number of captions per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                                  @Parameter(description = "string corresponding to the language of the caption") @RequestParam(name="language", required = false) String language,
                                  @Parameter(description = "takes as value one of the properties of the caption and orders the captions by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
-            throws OrderByPropertyDoesNotExistCaptionException {
+            throws OrderByPropertyDoesNotExistCaptionException, InvalidPageParametersException {
+
+        if (limit <= 0 || offset < 0){
+            throw new InvalidPageParametersException();
+        }
 
         Pageable paging;
 

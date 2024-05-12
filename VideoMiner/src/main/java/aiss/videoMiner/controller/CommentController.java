@@ -1,7 +1,6 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.*;
-import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Comment;
 import aiss.videoMiner.model.User;
 import aiss.videoMiner.model.Video;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
-import static aiss.videoMiner.helper.PaginationHelper.getCaptionPage;
 import static aiss.videoMiner.helper.PaginationHelper.getCommentPage;
 
 @Tag(name="Comment", description="Comment management API")
@@ -60,7 +58,12 @@ public class CommentController {
                                  @Parameter(description = "maximum number of comments per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
                                  @Parameter(description = "string contained in the text of the comment") @RequestParam(name="text", required = false) String text,
                                  @Parameter(description = "takes as value one of the properties of the comment and orders the comments by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
-            throws OrderByPropertyDoesNotExistCommentException {
+            throws OrderByPropertyDoesNotExistCommentException, InvalidPageParametersException {
+
+        if (limit <= 0 || offset < 0){
+            throw new InvalidPageParametersException();
+        }
+
         Pageable paging;
 
         if (orderBy != null){
