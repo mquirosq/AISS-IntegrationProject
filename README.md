@@ -87,7 +87,7 @@ The application is divided in three different microservices:
 
 ## Documentation
 
-Each service has been documented with the use of Swagger and can be accessed via the following links:
+Each service has been documented following the OpenAPI Specification standard. This has been done with the use of the documentation generation tool Swagger, and can be accessed via the following links:
 
 [VideoMiner Documentation](http://localhost:8080/swagger-ui/index.html#/channels/findAll_1)
 
@@ -106,5 +106,5 @@ The VideoMiner data mining tool makes use of three different port numbers, each 
 ##### YoutubeMiner: Port 8082
 
 ## OAuth
-The service has implemented Open Authorization for access delegation, adding a layer of security to the server resources
+The service has implemented Open Authorization for access delegation in the YoutubeMiner service, adding a layer of security to the server resources.
 
