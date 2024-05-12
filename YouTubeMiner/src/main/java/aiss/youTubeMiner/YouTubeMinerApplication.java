@@ -1,9 +1,11 @@
 package aiss.youTubeMiner;
 
+import aiss.youTubeMiner.oauth2.Authenticator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -12,8 +14,14 @@ public class YouTubeMinerApplication {
 		SpringApplication.run(YouTubeMinerApplication.class, args);
 	}
 
-	@Bean
+	@Bean("restTemplate")
 	public RestTemplate restTemplate(RestTemplateBuilder builder) {
 		return builder.build();
+	}
+
+	@Bean("authenticator")
+	@DependsOn("restTemplate")
+	public Authenticator authenticator() {
+		return new Authenticator();
 	}
 }
