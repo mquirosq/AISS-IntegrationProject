@@ -2,7 +2,6 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VUser;
@@ -23,7 +22,7 @@ public class CommentService {
     RestTemplate restTemplate;
 
     private String genVideoURI(String videoId, Integer maxComments) {
-        String uri = Constants.ytBase + "/commentThreads";
+        String uri = Constants.ytBaseUri + "/commentThreads";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
         uri += ("&maxResults=" + maxComments);
@@ -44,7 +43,7 @@ public class CommentService {
         List<Comment> aux = new ArrayList<>();
         Comment out = new Comment();
 
-        String uri = Constants.ytBase + "/commentThreads";
+        String uri = Constants.ytBaseUri + "/commentThreads";
         uri += ("?id=" + commentsId);
         uri += ("&part=" + "snippet");
         uri += ("&key=" + Constants.apiKey);
@@ -84,6 +83,7 @@ public class CommentService {
 
     public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> out = new ArrayList<>();
+
         String next = null;
 
         HttpHeaders headers = new HttpHeaders();
@@ -153,8 +153,8 @@ public class CommentService {
     private VUser transformUser(Comment comment) {
         VUser out = new VUser();
         out.setName(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
-        out.setPicture_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());
-        out.setUser_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorChannelUrl());
+        out.setPictureLink(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());
+        out.setUserLink(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorChannelUrl());
         return out;
     }
 

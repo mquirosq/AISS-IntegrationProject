@@ -11,8 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import aiss.youTubeMiner.videoModel.VUser;
-import aiss.youTubeMiner.youTubeModel.comment.Comment;
 import aiss.youTubeMiner.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +19,7 @@ import java.util.List;
 
 @Tag(name = "Comment", description = "Comment management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBase)
+@RequestMapping(Constants.apiBaseUri)
 public class CommentController {
 
     @Autowired
@@ -39,11 +37,6 @@ public class CommentController {
     @GetMapping("/videos/{videoId}/comments")
     public List<VComment> getCommentsFromVideo(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
         return commentService.getCommentsFromVideo(videoId, 10).stream().map(x->commentService.transformComment(x)).toList();
-    }
-
-    @GetMapping("/comments/{commentId}")
-    public VComment getComment(@PathVariable String commentId) throws CommentNotFoundException {
-        return commentService.transformComment(commentService.getComment(commentId));
     }
 
 }

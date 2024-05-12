@@ -26,7 +26,7 @@ public class CaptionService {
     RestTemplate restTemplate;
 
     public List<Caption> getCaptions(String videoId) throws CaptionNotFoundException {
-        String uri = Constants.ytBase + "/captions";
+        String uri = Constants.ytBaseUri + "/captions";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
         uri += ("&key=" + Constants.apiKey);

@@ -27,7 +27,7 @@ public class VideoService {
     CommentService commentService;
 
     private String genURI(String channelId, Integer maxVideos) {
-        String uri = Constants.ytBase + "/search";
+        String uri = Constants.ytBaseUri + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");

@@ -2,9 +2,7 @@ package aiss.youTubeMiner.controller;
 
 import aiss.youTubeMiner.exception.*;
 import aiss.youTubeMiner.helper.Constants;
-import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.videoModel.VVideo;
-import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.service.VideoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,7 +18,7 @@ import java.util.List;
 
 @Tag(name="Video", description="Video management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBase + "/channels")
+@RequestMapping(Constants.apiBaseUri + "/channels")
 public class VideoController {
     @Autowired
     VideoService videoService;

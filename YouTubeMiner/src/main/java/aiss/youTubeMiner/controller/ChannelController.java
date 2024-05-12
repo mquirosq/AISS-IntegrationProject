@@ -29,7 +29,7 @@ import java.util.List;
 
 @Tag(name="Channel", description="Channel management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBase + "/channels")
+@RequestMapping(Constants.apiBaseUri + "/channels")
 public class ChannelController {
 
     @Autowired
