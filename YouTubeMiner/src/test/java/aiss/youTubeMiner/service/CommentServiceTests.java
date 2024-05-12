@@ -24,7 +24,7 @@ public class CommentServiceTests {
     final String videoId = "P9-fJI0iZv4";
 
     @Test
-    void getComments() throws VideoCommentsNotFoundException, CommentNotFoundException {
+    void getComments() throws VideoCommentsNotFoundException, CommentNotFoundException, OAuthException {
         List<Comment> comments = commentService.getComments(videoId, 10, true);
         assertFalse(comments.isEmpty(), "Resulting comment list must not be empty.");
         comments.forEach(x->assertNotNull(x, "Resulting comment cannot be null."));

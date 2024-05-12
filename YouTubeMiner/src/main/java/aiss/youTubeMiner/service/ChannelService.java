@@ -52,7 +52,7 @@ public class ChannelService {
                     ChannelSearch.class
             );
             return response.getBody().getItems().get(0);
-        } catch (HttpClientErrorException.NotFound e) {
+        } catch (NullPointerException|HttpClientErrorException.NotFound e) {
             throw new ChannelNotFoundException();
         }
     }
