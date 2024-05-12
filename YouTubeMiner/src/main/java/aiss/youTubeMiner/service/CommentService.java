@@ -13,7 +13,6 @@ import org.springframework.http.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class CommentService {
@@ -30,58 +29,7 @@ public class CommentService {
         return uri;
     }
 
-    public VUser getUser(String commentsId) throws CommentNotFoundException {
-        try {
-            Comment cm = getComment(commentsId);
-            return transformUser(cm);
-        } catch (CommentNotFoundException e) {
-            throw new CommentNotFoundException();
-        }
-    }
-
-    public Comment getComment(String commentsId) throws CommentNotFoundException {
-        List<Comment> aux = new ArrayList<>();
-        Comment out = new Comment();
-
-        String uri = ConstantsHelper.ytBaseUri + "/commentThreads";
-        uri += ("?id=" + commentsId);
-        uri += ("&part=" + "snippet");
-        uri += ("&key=" + ConstantsHelper.apiKey);
-
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<CommentSearch> request = new HttpEntity<>(headers);
-
-        ResponseEntity<CommentSearch> response = restTemplate.exchange(
-                uri,
-                HttpMethod.GET,
-                request,
-                CommentSearch.class
-        );
-
-        try {
-            if (response.getBody() != null) {
-                aux.addAll(response.getBody().getItems());
-                out = Objects.requireNonNull(aux.stream().findFirst().orElse(null));
-            }
-
-            String next = getNextPage(uri, response);
-
-            while (next != null) {
-                response = restTemplate.exchange(next, HttpMethod.GET, null, CommentSearch.class);
-
-                if (response.getBody() != null) {
-                    aux.addAll(response.getBody().getItems());
-                    out = Objects.requireNonNull(aux.stream().findFirst().orElse(null));
-                }
-                next = getNextPage(uri, response);
-            }
-        } catch (RestClientResponseException | NullPointerException e) {
-            throw new CommentNotFoundException();
-        }
-        return out;
-    }
-
-    public List<Comment> getCommentsFromVideo(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
+    public List<Comment> getComments(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
         List<Comment> out = new ArrayList<>();
 
         String next = null;
@@ -97,15 +45,7 @@ public class CommentService {
                     request,
                     CommentSearch.class
             );
-        } catch (HttpStatusCodeException e) {
-            if (e.getStatusCode().value() == 403) {
-                out = new ArrayList<>();
-            } else if (e.getStatusCode().value() == 404) {
-                throw new CommentNotFoundException();
-            }
-        }
 
-        try {
             if (response != null && response.getBody() != null) {
                 out.addAll(response.getBody().getItems());
             }
@@ -119,7 +59,7 @@ public class CommentService {
                 }
                 next = getNextPage(genVideoURI(videoId, maxComments - out.size()), response);
             }
-        } catch (RestClientResponseException | CommentNotFoundException e) {
+        } catch (HttpClientErrorException.NotFound e) {
             throw new CommentNotFoundException();
         }
         return out;

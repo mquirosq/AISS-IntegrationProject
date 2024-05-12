@@ -2,8 +2,6 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.*;
 import aiss.youTubeMiner.helper.ConstantsHelper;
-import aiss.youTubeMiner.videoModel.VCaption;
-import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
@@ -17,16 +15,15 @@ import java.util.List;
 
 @Service
 public class VideoService {
+
     @Autowired
     RestTemplate restTemplate;
-
     @Autowired
     CaptionService captionService;
-
     @Autowired
     CommentService commentService;
 
-    private String genURI(String channelId, Integer maxVideos) {
+    private String generateURI(String channelId, Integer maxVideos) {
         String uri = ConstantsHelper.ytBaseUri + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
@@ -44,7 +41,7 @@ public class VideoService {
             List<VideoSnippet> out = null;
             String next = null;
             ResponseEntity<VideoSnippetSearch> response = restTemplate.exchange(
-                    genURI(channelId, maxVideos),
+                    generateURI(channelId, maxVideos),
                     HttpMethod.GET,
                     request,
                     VideoSnippetSearch.class
@@ -55,7 +52,7 @@ public class VideoService {
             } else {
                 return null;
             }
-            next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
+            next = getNextPage(generateURI(channelId, maxVideos - out.size()), response);
 
             while (out.size() < maxVideos && next != null) {
                 response = restTemplate.exchange(next, HttpMethod.GET, request, VideoSnippetSearch.class);
@@ -63,7 +60,7 @@ public class VideoService {
                 if (response.getBody() != null) {
                     out.addAll(response.getBody().getItems());
                 }
-                next = getNextPage(genURI(channelId, maxVideos - out.size()), response);
+                next = getNextPage(generateURI(channelId, maxVideos - out.size()), response);
             }
             return out;
         } catch (HttpClientErrorException.NotFound e) {
@@ -71,14 +68,10 @@ public class VideoService {
         }
     }
 
-    public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response) throws VideoNotFoundException {
+    public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response){
         String next = null;
 
-        try {
-            next = response.getBody().getNextPageToken();
-        } catch (NullPointerException e) {
-            throw new VideoNotFoundException();
-        }
+        next = response.getBody().getNextPageToken();
 
         if (next == null) {
             return null;

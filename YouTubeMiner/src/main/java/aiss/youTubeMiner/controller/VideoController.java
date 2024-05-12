@@ -25,7 +25,7 @@ public class VideoController {
 
     @Operation(
             summary="Retrieve Videos from channel",
-            description = "Get a List of Video objects belonging to the channel specified by id from YouTube",
+            description = "Get a List of VVideo objects belonging to the channel specified by id from YouTube",
             tags= {"videos", "get", "channels"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
@@ -33,8 +33,8 @@ public class VideoController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/{channelId}/videos")
-    public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer max)
+    public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer maxVideos)
             throws VideoNotFoundException {
-        return videoService.getVideos(channelId, (max == null) ? 10 : max).stream().map(video-> videoService.transformVideo(video)).toList();
+        return videoService.getVideos(channelId, (maxVideos == null) ? 10 : maxVideos).stream().map(video-> videoService.transformVideo(video)).toList();
     }
 }

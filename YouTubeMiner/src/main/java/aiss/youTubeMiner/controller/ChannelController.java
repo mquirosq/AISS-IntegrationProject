@@ -44,7 +44,7 @@ public class ChannelController {
 
     @Operation(
             summary="Retrieve a Channel by Id",
-            description = "Get a Channel object given by its id from YouTube",
+            description = "Get a VChannel object given by its id from YouTube",
             tags= {"channels", "get"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
@@ -87,7 +87,7 @@ public class ChannelController {
                 vVideo.getCaptions().add(vCaption);
             }
 
-            List<Comment> comments = commentService.getCommentsFromVideo(videoId, maxComments);
+            List<Comment> comments = commentService.getComments(videoId, maxComments);
             for (Comment comment : comments) {
                 VComment vComment = commentService.transformComment(comment);
                 vVideo.getComments().add(vComment);

@@ -27,7 +27,7 @@ public class CommentController {
 
     @Operation(
             summary="Retrieve Comments from video",
-            description = "Get a List of Comment objects belonging to the video specified by id from YouTube",
+            description = "Get a List of VComment objects belonging to the video specified by id from YouTube",
             tags= {"comments", "get", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
@@ -35,8 +35,10 @@ public class CommentController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/videos/{videoId}/comments")
-    public List<VComment> getCommentsFromVideo(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId) throws VideoCommentsNotFoundException, CommentNotFoundException {
-        return commentService.getCommentsFromVideo(videoId, 10).stream().map(x->commentService.transformComment(x)).toList();
+    public List<VComment> getCommentsFromVideo(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId,
+                                               @Parameter(description = "maximum number of comments to retrieve") @RequestParam Integer maxComments)
+            throws VideoCommentsNotFoundException, CommentNotFoundException {
+        return commentService.getComments(videoId, maxComments).stream().map(x->commentService.transformComment(x)).toList();
     }
 
 }

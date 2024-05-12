@@ -30,7 +30,7 @@ public class CaptionController {
 
     @Operation(
             summary="Retrieve Captions from video",
-            description = "Get a List of Caption objects belonging to the video specified by id from YouTube",
+            description = "Get a List of VCaption objects belonging to the video specified by id from YouTube",
             tags= {"captions", "get", "videos"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=

@@ -38,7 +38,7 @@ public class CaptionService {
                     CaptionSearch.class
             );
             return response.getBody().getItems();
-        } catch (NullPointerException|HttpClientErrorException.NotFound e) {
+        } catch (HttpClientErrorException.NotFound e) {
             throw new CaptionNotFoundException();
         }
     }
