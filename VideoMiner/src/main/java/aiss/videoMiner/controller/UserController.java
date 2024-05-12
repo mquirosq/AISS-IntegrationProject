@@ -121,27 +121,6 @@ public class UserController {
     }
 
     @Operation(
-            summary="Insert a User in a comment",
-            description = "Add a new User whose data is passed in the body of the request in JSON format to the specified comment by id",
-            tags= {"users", "post", "comments"})
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", content = {@Content(schema=
-            @Schema(implementation=User.class), mediaType="application/json")}),
-            @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
-            @ApiResponse(responseCode="400", content= {@Content(schema=@Schema())})
-    })
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/comments/{commentId}/user")
-    public User create(@Valid @RequestBody User user, @Parameter(description = "id of the comment the user will belong to") @PathVariable String commentId) throws CommentNotFoundException {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
-        comment.setAuthor(user);
-
-        commentRepository.save(comment);
-        return userRepository.save(user);
-    }
-
-    @Operation(
             summary="Update a User",
             description = "Update a User object by specifying its id and whose data is passed in the body of the request in JSON format",
             tags= {"users", "put"})
