@@ -80,6 +80,8 @@ public class CommentService {
             }
         } catch (HttpClientErrorException.NotFound e) {
             throw new CommentNotFoundException();
+        } catch(HttpClientErrorException.Forbidden e){
+            out = new ArrayList<>();
         }
         return out;
     }
