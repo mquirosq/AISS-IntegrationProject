@@ -52,8 +52,8 @@ public class ChannelController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("{channelId}")
-    public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException {
-        return channelService.getChannel(channelId);
+    public VChannel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException, VideoNotFoundException {
+        return channelService.transformChannel(channelService.getChannel(channelId));
     }
 
     @Operation(

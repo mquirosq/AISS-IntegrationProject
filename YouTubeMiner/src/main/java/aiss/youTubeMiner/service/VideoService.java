@@ -1,9 +1,9 @@
 package aiss.youTubeMiner.service;
 
-import aiss.youTubeMiner.exception.ChannelNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
-import aiss.youTubeMiner.exception.VideoNotFoundException;
+import aiss.youTubeMiner.exception.*;
 import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.videoModel.VCaption;
+import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
@@ -19,6 +19,12 @@ import java.util.List;
 public class VideoService {
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    CaptionService captionService;
+
+    @Autowired
+    CommentService commentService;
 
     private String genURI(String channelId, Integer maxVideos) {
         String uri = Constants.ytBase + "/search";
@@ -80,14 +86,18 @@ public class VideoService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VVideo transformVideo(VideoSnippet video) {
+    public VVideo transformVideo(VideoSnippet video) throws CaptionNotFoundException, VideoCommentsNotFoundException, CommentNotFoundException {
         VVideo out = new VVideo();
+        List<VCaption> vCaptions = new ArrayList<>();
+        List<VComment> vComments = new ArrayList<>();
+        captionService.getCaptions(video.getId().getVideoId()).forEach(ca -> vCaptions.add(captionService.transformCaption(ca)));
+        commentService.getCommentsFromVideo(video.getId().getVideoId(),10).forEach(co -> vComments.add(commentService.transformComment(co)));
         out.setId(video.getId().getVideoId());
         out.setName(video.getSnippet().getTitle());
         out.setDescription(video.getSnippet().getDescription());
         out.setReleaseTime(video.getSnippet().getPublishedAt());
-        out.setCaptions(new ArrayList<>());
-        out.setComments(new ArrayList<>());
+        out.setCaptions(vCaptions);
+        out.setComments(vComments);
         return out;
     }
 }
