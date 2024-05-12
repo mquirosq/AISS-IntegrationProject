@@ -2,8 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.*;
 import aiss.youTubeMiner.helper.ConstantsHelper;
-import aiss.youTubeMiner.videoModel.VCaption;
-import aiss.youTubeMiner.videoModel.VComment;
+import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippetSearch;
@@ -26,12 +25,10 @@ public class VideoService {
 
     @Autowired
     CommentService commentService;
-
-    private String generateURI(String channelId, Integer maxVideos) {
     @Autowired
     Authenticator authenticator;
 
-    private String generateURI(String channelId, Integer maxVideos, Boolean test) {
+    private String generateURI (String channelId, Integer maxVideos, Boolean test){
         String uri = ConstantsHelper.ytBaseUri + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
@@ -44,7 +41,8 @@ public class VideoService {
         return uri;
     }
 
-    public List<VideoSnippet> getVideos(String channelId, Integer maxVideos, Boolean test) throws VideoNotFoundException, OAuthException {
+    public List<VideoSnippet> getVideos (String channelId, Integer maxVideos, Boolean test) throws
+        VideoNotFoundException, OAuthException {
         HttpHeaders headers = null;
         if (!test) {
             headers = authenticator.getAuthHeader();
@@ -71,11 +69,10 @@ public class VideoService {
 
             while (out.size() < maxVideos && next != null) {
                 response = restTemplate.exchange(next, HttpMethod.GET, request, VideoSnippetSearch.class);
-
-                if (response.getBody() != null) {
-                    out.addAll(response.getBody().getItems());
-                }
-                next = getNextPage(generateURI(channelId, maxVideos - out.size(), test), response);
+                 if (response.getBody() != null) {
+                     out.addAll(response.getBody().getItems());
+                 }
+                 next = getNextPage(generateURI(channelId, maxVideos - out.size(), test), response);
             }
             return out;
         } catch (HttpClientErrorException e) {
@@ -83,7 +80,7 @@ public class VideoService {
         }
     }
 
-    public String getNextPage(String uri, ResponseEntity<VideoSnippetSearch> response){
+    public String getNextPage (String uri, ResponseEntity < VideoSnippetSearch > response){
         String next = null;
 
         next = response.getBody().getNextPageToken();
@@ -94,7 +91,7 @@ public class VideoService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VVideo transformVideo(VideoSnippet video){
+    public VVideo transformVideo (VideoSnippet video){
         VVideo out = new VVideo();
         out.setId(video.getId().getVideoId());
         out.setName(video.getSnippet().getTitle());

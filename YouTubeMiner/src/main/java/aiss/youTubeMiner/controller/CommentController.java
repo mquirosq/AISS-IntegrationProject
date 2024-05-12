@@ -42,7 +42,7 @@ public class CommentController {
     public List<VComment> getCommentsFromVideo(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId,
                                                @Parameter(description = "maximum number of comments to retrieve") @RequestParam Integer maxComments)
             throws VideoCommentsNotFoundException, CommentNotFoundException {
-        return commentService.getComments(videoId, maxComments, false).stream().map(x->commentService.transformComment(x)).toList();
+        return commentService.getComments(videoId, maxComments, false).stream().map(x -> commentService.transformComment(x)).toList();
     }
 
 }

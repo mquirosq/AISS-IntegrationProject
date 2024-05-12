@@ -36,7 +36,7 @@ public class VideoController {
     })
     @GetMapping("/{channelId}/videos")
     public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer maxVideos)
-            throws VideoNotFoundException {
+            throws VideoNotFoundException, OAuthException {
         return videoService.getVideos(channelId, (maxVideos == null) ? 10 : maxVideos, false).stream().map(video-> videoService.transformVideo(video)).toList();
     }
 }
