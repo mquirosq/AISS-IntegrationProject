@@ -2,7 +2,6 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
-import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.helper.Constants;
 import aiss.youTubeMiner.videoModel.VComment;
 import aiss.youTubeMiner.videoModel.VUser;
@@ -154,8 +153,8 @@ public class CommentService {
     private VUser transformUser(Comment comment) {
         VUser out = new VUser();
         out.setName(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorDisplayName());
-        out.setPicture_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());
-        out.setUser_link(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorChannelUrl());
+        out.setPictureLink(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorProfileImageUrl());
+        out.setUserLink(comment.getCommentSnippet().getTopLevelComment().getSnippet().getAuthorChannelUrl());
         return out;
     }
 
