@@ -1,7 +1,9 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CaptionNotFoundException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.helper.ConstantsHelper;
+import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
 import aiss.youTubeMiner.youTubeModel.caption.CaptionSearch;
@@ -21,20 +23,27 @@ public class CaptionService {
     @Autowired
     RestTemplate restTemplate;
 
-    public List<Caption> getCaptions(String videoId) throws CaptionNotFoundException {
+    @Autowired
+    Authenticator authenticator;
+
+    public List<Caption> getCaptions(String videoId, Boolean test) throws CaptionNotFoundException, OAuthException {
         String uri = ConstantsHelper.ytBaseUri + "/captions";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + ConstantsHelper.apiKey);
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<CaptionSearch> request = new HttpEntity<>(headers);
+        HttpHeaders headers = null;
+
+        if (test) {
+            uri += ("&key=" + ConstantsHelper.apiKey);
+        } else {
+            headers = authenticator.getAuthHeader();
+        }
 
         try {
             ResponseEntity<CaptionSearch> response = restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
-                    request,
+                    new HttpEntity<>(headers),
                     CaptionSearch.class
             );
             return response.getBody().getItems();

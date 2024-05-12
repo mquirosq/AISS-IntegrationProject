@@ -1,7 +1,9 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
+import aiss.youTubeMiner.videoModel.VUser;
 import aiss.youTubeMiner.youTubeModel.comment.Comment;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class CommentServiceTests {
 
     @Test
     void getComments() throws VideoCommentsNotFoundException, CommentNotFoundException {
-        List<Comment> comments = commentService.getComments(videoId, 10);
+        List<Comment> comments = commentService.getComments(videoId, 10, true);
         assertFalse(comments.isEmpty(), "Resulting comment list must not be empty.");
         comments.forEach(x->assertNotNull(x, "Resulting comment cannot be null."));
     }
@@ -32,7 +34,7 @@ public class CommentServiceTests {
     void getCommentsNotFound() {
         assertThrows(
                 CommentNotFoundException.class,
-                ()->commentService.getComments("everlong", 10),
+                ()->commentService.getComments("everlong", 10, true),
                 "Negative test must throw a CommentNotFoundException."
         );
     }

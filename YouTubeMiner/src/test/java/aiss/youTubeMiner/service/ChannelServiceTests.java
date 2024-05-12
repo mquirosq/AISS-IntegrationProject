@@ -1,9 +1,10 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.ChannelNotFoundException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
-import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.videoModel.VChannel;
+import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,8 @@ public class ChannelServiceTests {
     final String channelId = "UCAuUUnT6oDeKwE6v1NGQxug";
 
     @Test
-    void getChannelPositive() throws ChannelNotFoundException {
-        Channel channel = channelService.getChannel(channelId);
+    void getChannelPositive() throws ChannelNotFoundException, OAuthException {
+        Channel channel = channelService.getChannel(channelId, true);
         assertEquals(channel.getId(), channelId, "Resulting channel is not the requested one.");
     }
 
@@ -28,14 +29,14 @@ public class ChannelServiceTests {
     void getChannelNegative() {
         assertThrows(
                 ChannelNotFoundException.class,
-                ()->channelService.getChannel("foo"),
+                ()->channelService.getChannel("foo", true),
             "Negative test must throw a ChannelNotFoundException."
         );
     }
 
     @Test
-    void createChannel() throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException {
-        Channel channel = channelService.getChannel(channelId);
+    void createChannel() throws ChannelNotFoundException, VideoMinerConnectionRefusedException, OAuthException, VideoNotFoundException {
+        Channel channel = channelService.getChannel(channelId, true);
         VChannel channelRes = channelService.createChannel(channelService.transformChannel(channel));
 
         assertNotNull(channelRes, "Resulting channel cannot be null.");

@@ -44,7 +44,7 @@ public class ChannelController {
 
     @Operation(
             summary="Retrieve a Channel by Id",
-            description = "Get a VChannel object given by its id from YouTube",
+            description = "Get a Channel object given by its id from YouTube",
             tags= {"channels", "get"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
@@ -52,8 +52,8 @@ public class ChannelController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("{channelId}")
-    public VChannel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException, VideoNotFoundException {
-        return channelService.transformChannel(channelService.getChannel(channelId));
+    public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException, OAuthException {
+        return channelService.getChannel(channelId, false);
     }
 
     @Operation(
@@ -71,23 +71,23 @@ public class ChannelController {
     public VChannel populateOne(@Parameter(description = "id of the channel to be searched") @PathVariable String channelId,
                                 @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
                                 @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
-            throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException {
+            throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException, OAuthException {
 
-        Channel channel = channelService.getChannel(channelId);
+        Channel channel = channelService.getChannel(channelId, false);
         VChannel vChannel = channelService.transformChannel(channel);
 
-        List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos);
+        List<VideoSnippet> videos = videoService.getVideos(channelId, maxVideos, false);
         for (VideoSnippet v : videos) {
             VVideo vVideo = videoService.transformVideo(v);
             String videoId = v.getId().getVideoId();
 
-            List<Caption> captions = captionService.getCaptions(videoId);
+            List<Caption> captions = captionService.getCaptions(videoId, false);
             for (Caption caption : captions) {
                 VCaption vCaption = captionService.transformCaption(caption);
                 vVideo.getCaptions().add(vCaption);
             }
 
-            List<Comment> comments = commentService.getComments(videoId, maxComments);
+            List<Comment> comments = commentService.getComments(videoId, maxComments, false);
             for (Comment comment : comments) {
                 VComment vComment = commentService.transformComment(comment);
                 vVideo.getComments().add(vComment);
