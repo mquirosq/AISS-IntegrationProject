@@ -73,7 +73,7 @@ The application is divided in three different microservices:
 - Create a channel: 
 ```/vimeoMiner/api/v1/channels/{channelId}```
 
-###YouTubeMiner API
+### YouTubeMiner API
 ##### The YoutubeMiner API offers the following services (The documentation can be found [here](http://localhost:8082/swagger-ui/index.html#/)):
 
 #### GET
