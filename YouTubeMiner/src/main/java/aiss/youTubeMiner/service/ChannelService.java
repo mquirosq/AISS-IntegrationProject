@@ -1,13 +1,18 @@
 package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.ChannelNotFoundException;
+import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VChannel;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.youTubeModel.channel.ChannelSearch;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -20,20 +25,25 @@ public class ChannelService {
     @Autowired
     public RestTemplate restTemplate;
 
-    public Channel getChannel(String channelId) throws ChannelNotFoundException {
+    @Autowired
+    public Authenticator authenticator;
+
+    public Channel getChannel(String channelId) throws ChannelNotFoundException, OAuthException {
         String uri = Constants.ytBase + "/channels";
         uri += ("?id=" + channelId);
         uri += ("&part=" + "snippet");
-        uri += ("&key=" + Constants.apiKey);
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<ChannelSearch> request = new HttpEntity<>(headers);
+        HttpHeaders header = authenticator.getAuthHeader();
+
+        if (header == null) {
+            throw new OAuthException();
+        }
 
         try {
             ResponseEntity<ChannelSearch> response = restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
-                    request,
+                    new HttpEntity<>(header),
                     ChannelSearch.class
             );
             return response.getBody().getItems().get(0);

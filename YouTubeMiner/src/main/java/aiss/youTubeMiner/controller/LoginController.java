@@ -20,14 +20,13 @@ public class LoginController {
                     "</body>";
 
         if (code != null) {
-            authenticator.setToken(code);
+            authenticator.tokenRequest(code);
             out = "<title>YouTubeMiner</title>" +
                     "<body>" +
                         "<h1>YouTubeMiner</h1>" +
                         "<p>Login completed, you may now close this page.</p>" +
                     "</body>";
         } else if (error != null) {
-            authenticator.setToken(null);
             out = "<title>YouTubeMiner</title>" +
                     "<body>" +
                         "<h1>YouTubeMiner</h1>" +
@@ -36,6 +35,11 @@ public class LoginController {
                     "</body>";
         }
         return out;
+    }
+
+    @GetMapping("/done")
+    public String donePage() {
+        return "<body><p>DONE</p></body>";
     }
 
     @GetMapping("/login")

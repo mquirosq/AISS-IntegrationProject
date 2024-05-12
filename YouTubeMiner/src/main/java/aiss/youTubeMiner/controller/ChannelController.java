@@ -41,7 +41,6 @@ public class ChannelController {
     @Autowired
     CaptionService captionService;
 
-
     @Operation(
             summary="Retrieve a Channel by Id",
             description = "Get a Channel object given by its id from YouTube",
@@ -52,7 +51,7 @@ public class ChannelController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("{channelId}")
-    public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException {
+    public Channel findOne(@Parameter(description = "id of the video to search for") @PathVariable String channelId) throws ChannelNotFoundException, OAuthException {
         return channelService.getChannel(channelId);
     }
 
@@ -71,7 +70,7 @@ public class ChannelController {
     public VChannel populateOne(@Parameter(description = "id of the channel to be searched") @PathVariable String channelId,
                                 @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
                                 @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
-            throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException {
+            throws ChannelNotFoundException, VideoNotFoundException, VideoMinerConnectionRefusedException, VideoCommentsNotFoundException, CommentNotFoundException, CaptionNotFoundException, OAuthException {
 
         Channel channel = channelService.getChannel(channelId);
         VChannel vChannel = channelService.transformChannel(channel);
