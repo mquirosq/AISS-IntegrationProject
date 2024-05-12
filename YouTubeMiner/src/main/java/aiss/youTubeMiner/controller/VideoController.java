@@ -2,7 +2,7 @@ package aiss.youTubeMiner.controller;
 
 import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.service.VideoService;
 import aiss.youTubeMiner.videoModel.VVideo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag(name="Video", description="Video management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBase + "/channels")
+@RequestMapping(ConstantsHelper.apiBaseUri + "/channels")
 public class VideoController {
     @Autowired
     VideoService videoService;
@@ -36,6 +36,6 @@ public class VideoController {
     @GetMapping("/{channelId}/videos")
     public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId, @RequestParam(required = false) Integer max)
             throws VideoNotFoundException, OAuthException {
-        return videoService.getVideos(channelId, (max == null) ? 10 : max, false).stream().map(x->videoService.transformVideo(x)).toList();
+        return videoService.getVideos(channelId, (max == null) ? 10 : max, false).stream().map(video-> videoService.transformVideo(video)).toList();
     }
 }

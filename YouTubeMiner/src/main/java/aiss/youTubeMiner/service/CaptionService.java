@@ -2,7 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CaptionNotFoundException;
 import aiss.youTubeMiner.exception.OAuthException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VCaption;
 import aiss.youTubeMiner.youTubeModel.caption.Caption;
@@ -27,14 +27,14 @@ public class CaptionService {
     Authenticator authenticator;
 
     public List<Caption> getCaptions(String videoId, Boolean test) throws CaptionNotFoundException, OAuthException {
-        String uri = Constants.ytBase + "/captions";
+        String uri = ConstantsHelper.ytBaseUri + "/captions";
         uri += ("?videoId=" + videoId);
         uri += ("&part=" + "snippet");
 
         HttpHeaders headers = null;
 
         if (test) {
-            uri += ("&key=" + Constants.apiKey);
+            uri += ("&key=" + ConstantsHelper.apiKey);
         } else {
             headers = authenticator.getAuthHeader();
         }

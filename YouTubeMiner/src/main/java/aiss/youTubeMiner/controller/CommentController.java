@@ -3,7 +3,7 @@ package aiss.youTubeMiner.controller;
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.service.CommentService;
 import aiss.youTubeMiner.videoModel.VComment;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +13,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import aiss.youTubeMiner.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +26,7 @@ import java.util.List;
 
 @Tag(name = "Comment", description = "Comment management API using YouTube API")
 @RestController
-@RequestMapping(Constants.apiBase)
+@RequestMapping(ConstantsHelper.apiBaseUri)
 public class CommentController {
 
     @Autowired

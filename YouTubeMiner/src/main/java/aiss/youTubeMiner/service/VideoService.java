@@ -2,7 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoNotFoundException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.videoSnippet.VideoSnippet;
@@ -21,17 +21,23 @@ public class VideoService {
     RestTemplate restTemplate;
 
     @Autowired
+    CaptionService captionService;
+
+    @Autowired
+    CommentService commentService;
+
+    @Autowired
     Authenticator authenticator;
 
     private String genURI(String channelId, Integer maxVideos, Boolean test) {
-        String uri = Constants.ytBase + "/search";
+        String uri = ConstantsHelper.ytBaseUri + "/search";
         uri += ("?channelId=" + channelId);
         uri += ("&type=" + "video");
         uri += ("&part=" + "snippet");
         uri += ("&maxResults=" + ((maxVideos > 50) ? 50 : maxVideos));
 
         if (test) {
-            uri += ("&key=" + Constants.apiKey);
+            uri += ("&key=" + ConstantsHelper.apiKey);
         }
         return uri;
     }
@@ -90,7 +96,7 @@ public class VideoService {
         return uri + ("&pageToken=" + next);
     }
 
-    public VVideo transformVideo(VideoSnippet video) {
+    public VVideo transformVideo(VideoSnippet video){
         VVideo out = new VVideo();
         out.setId(video.getId().getVideoId());
         out.setName(video.getSnippet().getTitle());

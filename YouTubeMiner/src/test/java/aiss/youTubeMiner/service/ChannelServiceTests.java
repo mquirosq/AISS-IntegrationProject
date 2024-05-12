@@ -4,6 +4,7 @@ import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.youTubeMiner.videoModel.VChannel;
+import aiss.youTubeMiner.exception.VideoNotFoundException;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class ChannelServiceTests {
     }
 
     @Test
-    void createChannel() throws ChannelNotFoundException, VideoMinerConnectionRefusedException, OAuthException {
+    void createChannel() throws ChannelNotFoundException, VideoMinerConnectionRefusedException, OAuthException, VideoNotFoundException {
         Channel channel = channelService.getChannel(channelId, true);
         VChannel channelRes = channelService.createChannel(channelService.transformChannel(channel));
 

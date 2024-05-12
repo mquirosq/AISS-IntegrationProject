@@ -3,9 +3,10 @@ package aiss.youTubeMiner.service;
 import aiss.youTubeMiner.exception.ChannelNotFoundException;
 import aiss.youTubeMiner.exception.OAuthException;
 import aiss.youTubeMiner.exception.VideoMinerConnectionRefusedException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VChannel;
+import aiss.youTubeMiner.videoModel.VVideo;
 import aiss.youTubeMiner.youTubeModel.channel.Channel;
 import aiss.youTubeMiner.youTubeModel.channel.ChannelSearch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ChannelService {
@@ -26,17 +28,20 @@ public class ChannelService {
     public RestTemplate restTemplate;
 
     @Autowired
+    VideoService videoService;
+
+    @Autowired
     public Authenticator authenticator;
 
     public Channel getChannel(String channelId, Boolean test) throws ChannelNotFoundException, OAuthException {
-        String uri = Constants.ytBase + "/channels";
+        String uri = ConstantsHelper.ytBaseUri + "/channels";
         uri += ("?id=" + channelId);
         uri += ("&part=" + "snippet");
 
         HttpHeaders header = null;
 
         if (test) {
-            uri += ("&key=" + Constants.apiKey);
+            uri += ("&key=" + ConstantsHelper.apiKey);
         } else {
             header = authenticator.getAuthHeader();
         }
@@ -56,7 +61,7 @@ public class ChannelService {
 
     public VChannel createChannel(VChannel vChannel) throws VideoMinerConnectionRefusedException, ChannelNotFoundException {
         try {
-            String uri = Constants.vmBase + "/channels";
+            String uri = ConstantsHelper.vmBaseUri + "/channels";
             HttpEntity<VChannel> request = new HttpEntity<>(vChannel);
             ResponseEntity<VChannel> response = restTemplate.exchange(uri, HttpMethod.POST, request, VChannel.class);
             return response.getBody();
@@ -67,7 +72,7 @@ public class ChannelService {
         }
     }
 
-    public VChannel transformChannel(Channel channel) {
+    public VChannel transformChannel(Channel channel){
         VChannel out = new VChannel();
         out.setId(channel.getId());
         out.setDescription(channel.getSnippet().getDescription());
