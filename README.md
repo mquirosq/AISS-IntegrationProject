@@ -96,7 +96,7 @@ Each service has been documented following the OpenAPI Specification standard. T
 
 [YoutubeMiner Documentation](http://localhost:8082/swagger-ui/index.html#/channels/findAll_1)
 
-## Access Ports
+## Ports
 
 The VideoMiner data mining tool makes use of three different port numbers, each for a different service:
 
