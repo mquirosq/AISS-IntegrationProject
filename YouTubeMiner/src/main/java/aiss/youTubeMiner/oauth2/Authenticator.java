@@ -21,7 +21,7 @@ public class Authenticator {
     LocalDateTime lastRefreshTime;
 
     public Authenticator() {
-        System.out.println("\nIn case you want to use OAuth 2.0 authentication, please log in at: " + ConstantsHelper.ipBase + "/login\n");
+        System.out.println("\nOAuth 2.0 authentication is enabled, please log in at: " + ConstantsHelper.ipBase + "/login\n");
         this.token = null;
         this.lastRefreshTime = null;
     }
