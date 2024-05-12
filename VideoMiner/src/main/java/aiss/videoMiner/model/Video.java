@@ -16,6 +16,7 @@ public class Video {
 
     @Id
     @JsonProperty("id")
+    @NotNull(message = "Video must have an id")
     private String id;
 
     @JsonProperty("name")
