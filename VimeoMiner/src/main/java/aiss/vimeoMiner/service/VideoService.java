@@ -1,6 +1,7 @@
 package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.ChannelNotFoundException;
+import aiss.vimeoMiner.exception.IncorrectMaxValueException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.videoModel.VVideo;
@@ -34,10 +35,9 @@ import static aiss.vimeoMiner.helper.PaginationHelper.getPageAndItemsPerPage;
 public class VideoService {
     @Autowired
     RestTemplate restTemplate;
-    private Pair<Integer, Integer> pageAndItemsPerPage;
 
     // Get from Vimeo API
-    public List<Video> getVideos(String videosUri, Integer maxVideos) throws VideoNotFoundException {
+    public List<Video> getVideos(String videosUri, Integer maxVideos) throws VideoNotFoundException, IncorrectMaxValueException {
         // Get pagination (max)
         Pair<Integer, Integer> pageAndItemsPerPage = getPageAndItemsPerPage(maxVideos);
         String paginationParams = pageAndItemsPerPage == null? "": "?page=" + pageAndItemsPerPage.getFirst() + "&per_page=" + pageAndItemsPerPage.getSecond();
@@ -61,6 +61,9 @@ public class VideoService {
         }
         catch(HttpClientErrorException.NotFound err) {
             throw new VideoNotFoundException();
+        }
+        catch(HttpClientErrorException.BadRequest err){
+            throw new IncorrectMaxValueException();
         }
     }
 

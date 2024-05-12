@@ -1,6 +1,7 @@
 package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.CommentNotFoundException;
+import aiss.vimeoMiner.exception.IncorrectMaxValueException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.videoModel.VComment;
@@ -31,7 +32,7 @@ public class CommentService {
     @Autowired
     RestTemplate restTemplate;
 
-    public List<Comment> getComments(String commentUri, Integer maxComments) throws CommentNotFoundException {
+    public List<Comment> getComments(String commentUri, Integer maxComments) throws CommentNotFoundException, IncorrectMaxValueException {
         // Get pagination (max)
         Pair<Integer, Integer> pageAndItemsPerPage = getPageAndItemsPerPage(maxComments);
         String paginationParams = pageAndItemsPerPage == null? "": "?page=" + pageAndItemsPerPage.getFirst() + "&per_page=" + pageAndItemsPerPage.getSecond();
@@ -54,6 +55,8 @@ public class CommentService {
         }
         catch(HttpClientErrorException.NotFound err) {
                 throw new CommentNotFoundException();
+        } catch(HttpClientErrorException.BadRequest err){
+            throw new IncorrectMaxValueException();
         }
     }
 

@@ -2,6 +2,7 @@ package aiss.vimeoMiner.controller;
 
 import aiss.vimeoMiner.exception.CaptionNotFoundException;
 import aiss.vimeoMiner.exception.CommentNotFoundException;
+import aiss.vimeoMiner.exception.IncorrectMaxValueException;
 import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.service.CaptionService;
 import aiss.vimeoMiner.service.CommentService;
@@ -50,7 +51,7 @@ public class VideoController {
     @GetMapping("/channels/{channelId}/videos")
     public List<VVideo> findAll(@Parameter(description = "id of the channel to which the videos belong") @PathVariable String channelId,
                                 @Parameter(description = "maximum number of videos that will be retrieved") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
-                                @Parameter(description = "maximum number of comments that will be retrieved for each video") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws VideoNotFoundException, CaptionNotFoundException, CommentNotFoundException {
+                                @Parameter(description = "maximum number of comments that will be retrieved for each video") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws VideoNotFoundException, CaptionNotFoundException, CommentNotFoundException, IncorrectMaxValueException {
         List<Video> videos = videoService.getVideos("/channels/"+ channelId + "/videos", maxVideos);
         List<VVideo> vVideos = new ArrayList<>();
         for (Video v : videos) {
@@ -60,7 +61,7 @@ public class VideoController {
         return vVideos;
     }
 
-    public VVideo populateVVideo(Video video, Integer maxComments) throws CaptionNotFoundException, CommentNotFoundException {
+    public VVideo populateVVideo(Video video, Integer maxComments) throws CaptionNotFoundException, CommentNotFoundException, IncorrectMaxValueException {
         VVideo vVideo = videoService.transformVideo(video);
 
         List<Caption> captions = captionService.getCaptions(video.getMetadata().getConnections().getTexttracks().getUri());

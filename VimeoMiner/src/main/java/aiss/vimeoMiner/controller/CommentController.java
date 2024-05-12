@@ -2,6 +2,7 @@ package aiss.vimeoMiner.controller;
 
 import aiss.vimeoMiner.exception.CaptionNotFoundException;
 import aiss.vimeoMiner.exception.CommentNotFoundException;
+import aiss.vimeoMiner.exception.IncorrectMaxValueException;
 import aiss.vimeoMiner.service.CommentService;
 import aiss.vimeoMiner.videoModel.VComment;
 import aiss.vimeoMiner.vimeoModel.modelComment.Comment;
@@ -39,7 +40,7 @@ public class CommentController {
     })
     @GetMapping("/videos/{videoId}/comments")
     public List<VComment> findAll(@Parameter(description = "id of the video to which the comments belong") @PathVariable String videoId,
-    @Parameter(description = "maximum number of comments that will be retrieved for each video") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws CommentNotFoundException {
+    @Parameter(description = "maximum number of comments that will be retrieved for each video") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws CommentNotFoundException, IncorrectMaxValueException {
         List<Comment> comments = commentService.getComments("/videos/"+ videoId + "/comments", maxComments);
         List<VComment> vComments = new ArrayList<>();
         for (Comment comment : comments) {

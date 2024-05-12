@@ -1,6 +1,7 @@
 package aiss.vimeoMiner.service;
 
 import aiss.vimeoMiner.exception.CommentNotFoundException;
+import aiss.vimeoMiner.exception.IncorrectMaxValueException;
 import aiss.vimeoMiner.exception.VideoMinerConnectionRefusedException;
 import aiss.vimeoMiner.exception.VideoNotFoundException;
 import aiss.vimeoMiner.videoModel.VComment;
@@ -22,7 +23,7 @@ public class CommentServiceTest {
     CommentService service;
 
     @Test
-    void getComments() throws CommentNotFoundException {
+    void getComments() throws CommentNotFoundException, IncorrectMaxValueException {
         String videoId = "322774604";
         Integer maxComments = 3;
         List<Comment> comments = service.getComments("/videos/" + videoId + "/comments", maxComments);

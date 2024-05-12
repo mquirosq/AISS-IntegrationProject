@@ -51,7 +51,7 @@ public class ChannelController {
     public VChannel findOne(@Parameter(description = "id of the channel to be searched") @PathVariable String channelId,
                             @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
                             @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
-            throws ChannelNotFoundException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException, TooManyRequestsException {
+            throws IncorrectMaxValueException, ChannelNotFoundException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException, TooManyRequestsException {
 
         try{
             return populateChannel(channelId, maxVideos, maxComments);
@@ -77,7 +77,7 @@ public class ChannelController {
     public VChannel populateOne(@Parameter(description = "id of the channel to be searched") @PathVariable String channelId,
                                 @Parameter(description = "maximum number of videos to retrieve from the channel") @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos,
                                 @Parameter(description = "maximum number of comments to retrieve from the videos in the channel") @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments)
-            throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException, TooManyRequestsException {
+            throws ChannelNotFoundException, VideoMinerConnectionRefusedException, VideoNotFoundException, CommentNotFoundException, CaptionNotFoundException, TooManyRequestsException, IncorrectMaxValueException {
 
         try{
             VChannel vChannel = populateChannel(channelId, maxVideos, maxComments);
@@ -88,7 +88,7 @@ public class ChannelController {
         }
     }
 
-    private VChannel populateChannel(@PathVariable String channelId, @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos, @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws ChannelNotFoundException, VideoNotFoundException, CaptionNotFoundException, CommentNotFoundException {
+    private VChannel populateChannel(@PathVariable String channelId, @RequestParam(name = "maxVideos", defaultValue = "10") Integer maxVideos, @RequestParam(name = "maxComments", defaultValue = "10") Integer maxComments) throws ChannelNotFoundException, VideoNotFoundException, CaptionNotFoundException, CommentNotFoundException, IncorrectMaxValueException {
         Channel channel = channelService.getChannel(channelId);
         VChannel vChannel = channelService.transformChannel(channel);
 
