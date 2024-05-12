@@ -12,7 +12,8 @@ The application is divided in three different microservices:
 
 ## Usage
 
-### The VideoMiner API offers the following services (The documentation can be found [here](http://localhost:8080/swagger-ui/index.html#/channels/findAll_1)):
+###VideoMiner API:
+##### The VideoMiner API offers the following services (The documentation can be found [here](http://localhost:8080/swagger-ui/index.html#/channels/findAll_1)):
 #### GET
 - Retrieve Video by Id: 
 ```/videominer/videos/{videoId}```
@@ -56,7 +57,8 @@ The application is divided in three different microservices:
 - Delete a Caption: ``` /videominer/captions/{captionId} ```
 
 
-### The VimeoMiner API offers the following services (The documentation can be found [here](http://localhost:8081/swagger-ui/index.html#/channels/findAll_1)):
+### VimeoMiner API 
+##### The vimeoMiner API offers the following services (The documentation can be found [here](http://localhost:8081/swagger-ui/index.html#/channels/findAll_1)):
 
 #### GET
 - Retrieve a channel: 
@@ -70,16 +72,15 @@ The application is divided in three different microservices:
 ### POST
 - Create a channel: 
 ```/vimeoMiner/api/v1/channels/{channelId}```
-### The YoutubeMiner service offers the following services (The documentation can be found [here](http://localhost:8082/swagger-ui/index.html#/)):
+
+###YouTubeMiner API
+##### The YoutubeMiner API offers the following services (The documentation can be found [here](http://localhost:8082/swagger-ui/index.html#/)):
 
 #### GET
 - Retrieve a channel by Id:  ```/youTubeMiner/api/v1/channels/{channelId}```
 - Retrieve videos from channel: ```/youTubeMiner/api/v1/channels/{channelId}/videos```
-
 - Retrieve comments from video: ```/youTubeMiner/api/v1/videos/{videoId}/comments```
-
 - Retrieve captions from video: ```/youTubeMiner/api/v1/videos/{videoId}/captions```
-
 - Retrieve a User from comment: ```/youTubeMiner/api/v1/comments/{commentId}/user```
 
 #### POST
@@ -106,5 +107,8 @@ The VideoMiner data mining tool makes use of three different port numbers, each 
 ##### YoutubeMiner: Port 8082
 
 ## OAuth
-The service has implemented Open Authorization for access delegation in the YoutubeMiner service, adding a layer of security to the server resources.
+The service has implemented Open Authorization (OAuth 2.0) for access delegation in the YoutubeMiner service, adding a layer of security to the server resources.
 
+## Pagination, filters and sorting
+The VideoMiner API offers pagination, filtering and sorting in all it's GET requests were a list of elements is retreived.
+This is done through request parameters that can be added in the URI of the request.
