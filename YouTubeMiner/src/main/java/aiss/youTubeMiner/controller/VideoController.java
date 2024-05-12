@@ -42,6 +42,7 @@ public class VideoController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation= VVideo.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="401", content = {@Content(schema=@Schema())}),
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/{channelId}/videos")
