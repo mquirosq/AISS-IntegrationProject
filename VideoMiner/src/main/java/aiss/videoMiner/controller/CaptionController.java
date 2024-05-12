@@ -1,8 +1,8 @@
 package aiss.videoMiner.controller;
 
-import aiss.videoMiner.exception.CaptionNotFoundException;
-import aiss.videoMiner.exception.VideoNotFoundException;
+import aiss.videoMiner.exception.*;
 import aiss.videoMiner.model.Caption;
+import aiss.videoMiner.model.Channel;
 import aiss.videoMiner.model.Video;
 import aiss.videoMiner.repository.CaptionRepository;
 import aiss.videoMiner.repository.VideoRepository;
@@ -15,6 +15,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
+import static aiss.videoMiner.helper.PaginationHelper.getCaptionPage;
+import static aiss.videoMiner.helper.PaginationHelper.getVideoPage;
 
 @Tag(name="Caption", description="Caption management API")
 @RestController
@@ -37,10 +44,44 @@ public class CaptionController {
             summary="Retrieve all Captions",
             description = "Get a list of Caption objects including all the captions in the VideoMiner database",
             tags= {"captions", "get", "all"})
-    @ApiResponse(responseCode = "200", content = {@Content(schema=
-        @Schema(implementation=Caption.class), mediaType="application/json")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema=
+            @Schema(implementation= Caption.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())})
+    })
     @GetMapping("/captions")
-    public List<Caption> findAll() { return captionRepository.findAll(); }
+    public List<Caption> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                                 @Parameter(description = "maximum number of captions per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                 @Parameter(description = "string corresponding to the language of the caption") @RequestParam(name="language", required = false) String language,
+                                 @Parameter(description = "takes as value one of the properties of the caption and orders the captions by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy)
+            throws OrderByPropertyDoesNotExistCaptionException {
+
+        Pageable paging;
+
+        if (orderBy != null){
+            if (orderBy.startsWith("-")){
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+            }
+            else {
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
+            }
+        }
+        else
+            paging = PageRequest.of(offset, limit);
+
+        Page<Caption> pageChannels;
+
+        try{
+            if (language != null)
+                pageChannels = captionRepository.findByLanguage(language, paging);
+            else
+                pageChannels = captionRepository.findAll(paging);
+        }
+        catch(PropertyReferenceException err){
+            throw new OrderByPropertyDoesNotExistCaptionException();
+        }
+        return pageChannels.getContent();
+    }
 
     @Operation(
             summary="Retrieve a Caption by Id",
@@ -66,8 +107,19 @@ public class CaptionController {
             @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/videos/{videoId}/captions")
-    public List<Caption> findByVideo(@Parameter(description="id of the video from which to retrieve the captions")@PathVariable String videoId) throws VideoNotFoundException {
-        return videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new).getCaptions();
+    public List<Caption> findByVideo(@Parameter(description="id of the video from which to retrieve the captions") @PathVariable String videoId, @Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                                     @Parameter(description = "maximum number of captions per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                     @Parameter(description = "string that is the  language of the captions") @RequestParam(name="language", required = false) String language,
+                                     @Parameter(description = "takes as value one of the properties of the caption and orders the captions by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws VideoNotFoundException, OrderByPropertyDoesNotExistCaptionException {
+
+        List<Caption> captions =  videoRepository.findById(videoId).orElseThrow(VideoNotFoundException::new).getCaptions();
+
+        if (language != null){
+            captions = captions.stream().filter(caption -> caption.getLanguage().contains(language)).toList();
+        }
+
+        Page<Caption> pageCaption = getCaptionPage(offset, limit, captions, orderBy);
+        return pageCaption.getContent();
     }
 
     @Operation(
