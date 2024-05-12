@@ -44,8 +44,11 @@ public class VideoController {
             summary="Retrieve all Videos",
             description = "Get a list of Video objects including all the videos in the VideoMiner database",
             tags= {"videos", "get", "all"})
-    @ApiResponse(responseCode = "200", content = {@Content(schema=
-        @Schema(implementation= Video.class), mediaType="application/json")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema=
+            @Schema(implementation=Video.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())})
+    })
     @GetMapping("/videos")
     public List<Video> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
                                @Parameter(description = "maximum number of videos per page") @RequestParam(name = "limit", defaultValue = "10") int limit,

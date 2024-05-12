@@ -3,6 +3,7 @@ package aiss.videoMiner.controller;
 import aiss.videoMiner.exception.ChannelNotFoundException;
 import aiss.videoMiner.exception.OrderByPropertyDoesNotExistChannelException;
 import aiss.videoMiner.model.Channel;
+import aiss.videoMiner.model.Video;
 import aiss.videoMiner.repository.ChannelRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,8 +38,11 @@ public class ChannelController {
             summary="Retrieve all Channels",
             description = "Get a list of Channel objects including all the channels in the VideoMiner database",
             tags= {"channels", "get", "all"})
-    @ApiResponse(responseCode = "200", content = {@Content(schema=
-    @Schema(implementation=Channel.class), mediaType="application/json")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema=
+            @Schema(implementation= Channel.class), mediaType="application/json")}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())})
+    })
     @GetMapping
     public List<Channel> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
                                  @Parameter(description = "maximum number of channels per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
