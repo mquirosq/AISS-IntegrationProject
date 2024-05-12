@@ -12,7 +12,7 @@ The application is divided in three different microservices:
 
 ## Usage
 
-###VideoMiner API:
+### VideoMiner API:
 ##### The VideoMiner API offers the following services (The documentation can be found [here](http://localhost:8080/swagger-ui/index.html#/channels/findAll_1)):
 #### GET
 - Retrieve Video by Id: 
