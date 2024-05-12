@@ -1,6 +1,8 @@
 package aiss.videoMiner.controller;
 
 import aiss.videoMiner.exception.ChannelNotFoundException;
+import aiss.videoMiner.exception.OrderByPropertyDoesNotExistChannelException;
+import aiss.videoMiner.exception.OrderByPropertyDoesNotExistVideoException;
 import aiss.videoMiner.exception.VideoNotFoundException;
 import aiss.videoMiner.model.Caption;
 import aiss.videoMiner.model.Channel;
@@ -16,13 +18,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import static aiss.videoMiner.helper.ConstantsHelper.apiBaseUri;
+import static aiss.videoMiner.helper.PaginationHelper.*;
 
 @Tag(name="Video", description = "Video management API")
 @RestController
@@ -41,8 +47,38 @@ public class VideoController {
     @ApiResponse(responseCode = "200", content = {@Content(schema=
         @Schema(implementation= Video.class), mediaType="application/json")})
     @GetMapping("/videos")
-    public List<Video> findAll() {
-        return videoRepository.findAll();
+    public List<Video> findAll(@Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                               @Parameter(description = "maximum number of videos per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                               @Parameter(description = "string that must be included in the name of the video") @RequestParam(name="name", required = false) String name,
+                               @Parameter(description = "takes as value one of the properties of the video and orders the videos by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws OrderByPropertyDoesNotExistVideoException {
+
+        Pageable paging;
+
+        if (orderBy != null){
+            if (orderBy.startsWith("-")){
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy.substring(1)).descending());
+            }
+            else {
+                paging = PageRequest.of(offset, limit, Sort.by(orderBy).ascending());
+            }
+        }
+        else
+            paging = PageRequest.of(offset, limit);
+
+        Page<Video> pageVideos;
+
+        try{
+            if (name != null)
+                pageVideos = videoRepository.findByNameContaining(name, paging);
+            else
+                pageVideos = videoRepository.findAll(paging);
+        }
+        catch(PropertyReferenceException err){
+            throw new OrderByPropertyDoesNotExistVideoException();
+        }
+        return pageVideos.getContent();
+
+
     }
 
     @Operation(
@@ -52,7 +88,8 @@ public class VideoController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
                 @Schema(implementation=Video.class), mediaType="application/json")}),
-            @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
+            @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/videos/{videoId}")
     public Video findOne(@Parameter(description = "id of the video to be searched") @PathVariable String videoId) throws VideoNotFoundException {
@@ -66,11 +103,24 @@ public class VideoController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema=
             @Schema(implementation=Video.class), mediaType="application/json")}),
-            @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())})
+            @ApiResponse(responseCode="404", content = {@Content(schema=@Schema())}),
+            @ApiResponse(responseCode="400", content = {@Content(schema=@Schema())})
     })
     @GetMapping("/channels/{channelId}/videos")
-    public List<Video> findByChannel(@Parameter(description = "id of the channel from which to retrieve all videos") @PathVariable String channelId) throws ChannelNotFoundException {
-        return channelRepository.findById(channelId).orElseThrow(ChannelNotFoundException::new).getVideos();
+    public List<Video> findByChannel(@Parameter(description = "id of the channel from which to retrieve all videos") @PathVariable String channelId,
+                                     @Parameter(description = "page to retrieve") @RequestParam(name = "offset", defaultValue = "0") int offset,
+                                     @Parameter(description = "maximum number of videos per page") @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                     @Parameter(description = "string that must be included in the name of the video") @RequestParam(name="name", required = false) String name,
+                                     @Parameter(description = "takes as value one of the properties of the video and orders the videos by that parameter, ascending by default. To get the descending order add a - just before the name of the property") @RequestParam(name="orderBy", required = false) String orderBy) throws ChannelNotFoundException, OrderByPropertyDoesNotExistVideoException {
+
+        List<Video> videos =  channelRepository.findById(channelId).orElseThrow(ChannelNotFoundException::new).getVideos();
+
+        if (name != null){
+            videos = videos.stream().filter(video -> video.getName().contains(name)).toList();
+        }
+
+        Page<Video> pageVideo = getVideoPage(offset, limit, videos, orderBy);
+        return pageVideo.getContent();
     }
 
     @Operation(
