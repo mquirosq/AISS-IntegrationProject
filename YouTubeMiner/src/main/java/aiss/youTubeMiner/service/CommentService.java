@@ -2,6 +2,7 @@ package aiss.youTubeMiner.service;
 
 import aiss.youTubeMiner.exception.CommentNotFoundException;
 import aiss.youTubeMiner.exception.OAuthException;
+import aiss.youTubeMiner.exception.VideoCommentsNotFoundException;
 import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.oauth2.Authenticator;
 import aiss.youTubeMiner.videoModel.VComment;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -42,7 +44,7 @@ public class CommentService {
         return uri;
     }
 
-    public List<Comment> getComments(String videoId, Integer maxComments) throws VideoCommentsNotFoundException, CommentNotFoundException {
+    public List<Comment> getComments(String videoId, Integer maxComments, Boolean test) throws VideoCommentsNotFoundException, CommentNotFoundException, OAuthException {
         List<Comment> out = new ArrayList<>();
 
         String next = null;
