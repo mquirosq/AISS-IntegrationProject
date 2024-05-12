@@ -1,7 +1,7 @@
 package aiss.youTubeMiner.oauth2;
 
 import aiss.youTubeMiner.exception.OAuthException;
-import aiss.youTubeMiner.helper.Constants;
+import aiss.youTubeMiner.helper.ConstantsHelper;
 import aiss.youTubeMiner.oAuthModel.AccessToken;
 import aiss.youTubeMiner.oAuthModel.RefreshToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,34 +21,34 @@ public class Authenticator {
     LocalDateTime lastRefreshTime;
 
     public Authenticator() {
-        System.out.println("\nOAuth 2.0 authentication is enabled.\nPlease authenticate at " + Constants.ipBase + "/login\n");
+        System.out.println("\nOAuth 2.0 authentication is enabled.\nPlease authenticate at " + ConstantsHelper.ipBase + "/login\n");
         this.token = null;
         this.lastRefreshTime = null;
     }
 
     public String authRequest() {
-        String uri = Constants.oauthBase;
-                uri += ("?client_id=" + Constants.clientId);
+        String uri = ConstantsHelper.oauthBase;
+                uri += ("?client_id=" + ConstantsHelper.clientId);
                 uri += ("&response_type=" + "code");
-                uri += ("&scope=" + Constants.ytScope);
+                uri += ("&scope=" + ConstantsHelper.ytScope);
                 uri += ("&access_type=" + "offline");
-                uri += ("&redirect_uri=" + Constants.ipBase);
+                uri += ("&redirect_uri=" + ConstantsHelper.ipBase);
         ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, null, String.class);
         return response.getBody();
     }
 
     public void tokenRequest(String code) {
-        String uri = Constants.tokenBase + "/token";
-                uri += ("?client_id=" + Constants.clientId);
-                uri += ("&client_secret=" + Constants.clientSecret);
+        String uri = ConstantsHelper.tokenBase + "/token";
+                uri += ("?client_id=" + ConstantsHelper.clientId);
+                uri += ("&client_secret=" + ConstantsHelper.clientSecret);
                 uri += ("&code=" + code);
                 uri += ("&grant_type=" + "authorization_code");
-                uri += ("&redirect_uri=" + Constants.ipBase);
+                uri += ("&redirect_uri=" + ConstantsHelper.ipBase);
         token = restTemplate.exchange(uri, HttpMethod.POST, null, AccessToken.class).getBody();
         lastRefreshTime = LocalDateTime.now();
 
         System.out.println("\nSuccessfully logged in.");
-        System.out.println("You may log out here: " + Constants.ipBase + "/logout\n");
+        System.out.println("You may log out here: " + ConstantsHelper.ipBase + "/logout\n");
     }
 
     public String revokeRequest() {
@@ -59,12 +59,10 @@ public class Authenticator {
             System.out.println("\n" + out + "\n");
             return out;
         }
-        String uri = Constants.tokenBase + "/revoke";
+        String uri = ConstantsHelper.tokenBase + "/revoke";
                 uri += ("?token=" + token.getAccessToken());
-        ResponseEntity<String> response = null;
-
         try {
-            response = restTemplate.exchange(uri, HttpMethod.POST, null, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, null, String.class);
             token = null;
             out = "Successfully logged out.";
         } catch (RestClientResponseException e) {
@@ -75,9 +73,9 @@ public class Authenticator {
     }
 
     public void refreshRequest() {
-        String uri = Constants.tokenBase + "/token";
-                uri += ("?client_id=" + Constants.clientId);
-                uri += ("&client_secret=" + Constants.clientSecret);
+        String uri = ConstantsHelper.tokenBase + "/token";
+                uri += ("?client_id=" + ConstantsHelper.clientId);
+                uri += ("&client_secret=" + ConstantsHelper.clientSecret);
                 uri += ("&refresh_token=" + token.getRefreshToken());
                 uri += ("&grant_type=" + "refresh_token");
         ResponseEntity<RefreshToken> response = restTemplate.exchange(uri, HttpMethod.POST, null, RefreshToken.class);
